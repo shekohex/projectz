@@ -74,7 +74,7 @@ rustflags = [
     # - Ubuntu: `sudo apt-get install lld clang`
     # - Fedora: `sudo dnf install lld clang`
     # - Arch: `sudo pacman -S lld clang`
-    "-Clink-arg=-fuse-ld=lld",
+    # "-Clink-arg=-fuse-ld=lld",
     # Mold linker
     #
     # You may need to install it:
@@ -82,11 +82,11 @@ rustflags = [
     # - Ubuntu: `sudo apt-get install mold clang`
     # - Fedora: `sudo dnf install mold clang`
     # - Arch: `sudo pacman -S mold clang`
-    # "-Clink-arg=-fuse-ld=/usr/bin/mold",
+    "-Clink-arg=-fuse-ld=mold",
 
     # Nightly
-    # "-Zshare-generics=y",
-    # "-Zthreads=0",
+    "-Zshare-generics=y",
+    "-Zthreads=0",
 ]
 
 [target.x86_64-apple-darwin]
@@ -116,11 +116,11 @@ rustflags = [
     #
     # Brew: `brew install llvm`
     # Manually: <https://lld.llvm.org/MachO/index.html>
-    # "-Clink-arg=-fuse-ld=/opt/homebrew/opt/llvm/bin/ld64.lld",
+    "-Clink-arg=-fuse-ld=lld",
 
     # Nightly
-    # "-Zshare-generics=y",
-    # "-Zthreads=0",
+    "-Zshare-generics=y",
+    "-Zthreads=0",
 ]
 
 [target.x86_64-pc-windows-msvc]
@@ -148,4 +148,4 @@ rustflags = [
 # This is not enabled by default, you need to copy this file to `config.toml`.
 [alias]
 ci = "run --package ci --"
-play = "run --features bevy/dynamic_linking --"
+play = "run --features dev --"

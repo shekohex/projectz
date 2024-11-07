@@ -3,6 +3,7 @@
 # Windows Specific Settings
 set windows-shell := ["powershell.exe", "-NoLogo", "-Command"]
 
+# Default task, runs the project in dev mode
 default: run
 
 # Run the project in development mode
