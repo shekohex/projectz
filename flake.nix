@@ -41,10 +41,9 @@
             (lib.optionals pkgs.stdenv.isDarwin pkgs.darwin.apple_sdk.frameworks.AppKit)
           ];
           buildInputs = [
-            # We want the unwrapped version, wrapped comes with nixpkgs' toolchain
-            pkgs.rust-analyzer-unwrapped
             # Nix language server
             pkgs.nixd
+            pkgs.nixfmt
             # Finally the toolchain
             toolchain
             pkgs.taplo

@@ -1,9 +1,9 @@
 //! Development plugins and systems
 //!
-//! This module contains development plugins and systems that are only enabled when the `dev` feature is enabled.
+//! This module contains development plugins and systems that are only enabled when the `dev`
+//! feature is enabled.
 
-use bevy::app::PluginGroup;
-use bevy::app::PluginGroupBuilder;
+use bevy::app::{PluginGroup, PluginGroupBuilder};
 
 /// Development plugins and systems
 pub struct DevPlugins;
@@ -34,6 +34,7 @@ impl PluginGroup for DevPlugins {
                 .add(bevy_editor_pls::EditorPlugin::default())
                 .add(bevy::diagnostic::FrameTimeDiagnosticsPlugin)
                 .add(bevy::dev_tools::fps_overlay::FpsOverlayPlugin::default())
+                .add(bevy_editor_pls::EditorPlugin::default())
         }
         #[cfg(not(feature = "dev"))]
         {
