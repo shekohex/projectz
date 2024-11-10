@@ -12,7 +12,7 @@ pub use self::states::*;
 
 /// Player prelude.
 mod player {
-    // pub use crate::player::{Player, PlayerCamera, PlayerPlugin};
+    pub use crate::player::{Player, PlayerPlugins};
 }
 
 mod camera {

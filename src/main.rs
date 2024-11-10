@@ -14,6 +14,7 @@ fn main() {
             LoadingState::new(GameState::LoadingAssets).continue_to_state(GameState::LoadingWorld),
         )
         .add_plugins(GameCameraPlugin)
+        .add_plugins(PlayerPlugins)
         .add_systems(OnEnter(GameState::LoadingWorld), setup_world)
         .run();
 }

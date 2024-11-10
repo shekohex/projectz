@@ -7,7 +7,7 @@ pub struct GameCameraPlugin;
 
 impl Plugin for GameCameraPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, setup_camera);
+        app.register_type::<PrimaryCamera>().add_systems(Startup, setup_camera);
     }
 }
 

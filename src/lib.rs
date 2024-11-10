@@ -9,7 +9,7 @@ pub mod dev_tools;
 /// Physics plugins and systems
 pub mod physics;
 /// Player plugin and systems
-// pub mod player;
+pub mod player;
 /// Our game prelude
 pub mod prelude;
 /// Window plugin customizations
