@@ -3,6 +3,8 @@
 use crate::prelude::*;
 
 use bevy::prelude::*;
+use bevy::utils::{Duration, HashMap};
+use bevy_asset_loader::prelude::*;
 use leafwing_input_manager::prelude::*;
 /// Player Plugin to organize player related systems
 pub struct PlayerPlugins;
@@ -12,16 +14,51 @@ pub struct PlayerPlugins;
 #[reflect(Component)]
 pub struct Player;
 
+#[derive(AssetCollection, Resource)]
+pub struct PlayerAssets {
+    #[asset(path = "meshes/xbot.gltf#Scene0")]
+    pub player: Handle<Scene>,
+    #[asset(path = "ani/idle.gltf#Animation0")]
+    pub idle_animation: Handle<AnimationClip>,
+
+    pub animation_graph: Handle<AnimationGraph>,
+
+    /// Player animations
+    pub animations: HashMap<PlayerAnimation, AnimationNodeIndex>,
+}
+
+#[derive(Default, Debug, Clone, Eq, PartialEq, Hash)]
+pub enum PlayerAnimation {
+    #[default]
+    Idle,
+    Walk,
+    Run,
+    Jump,
+    Fall,
+    Fly,
+    Land,
+}
+
 #[derive(Bundle)]
 struct PlayerBundle {
     name: Name,
     // This bundle must be added to your player entity
     // (or whatever else you wish to control)
     input_manager: InputManagerBundle<PlayerAction>,
+    // Player Mesh
+    scene: Handle<Scene>,
     // Player Transform
     transform: Transform,
+    // Player Global Transform
+    global_transform: GlobalTransform,
     // Player Tag
     player: Player,
+    /// User-driven visibility of the scene root entity.
+    pub visibility: Visibility,
+    /// Inherited visibility of the scene root entity.
+    pub inherited_visibility: InheritedVisibility,
+    /// Algorithmically-computed visibility of the scene root entity for rendering.
+    pub view_visibility: ViewVisibility,
 }
 
 /// A run condition that is always false
@@ -32,11 +69,18 @@ const fn never() -> bool {
 
 impl Default for PlayerBundle {
     fn default() -> Self {
+        let transform = Transform::from_xyz(-2.5, 2.5, 2.5);
+        let visibility = Visibility::Inherited;
         Self {
             name: Name::new("Player"),
             input_manager: InputManagerBundle::with_map(Self::default_input_map()),
-            transform: Transform::from_xyz(-2.5, 2.5, 2.5),
+            transform,
+            global_transform: GlobalTransform::from(transform),
             player: Player,
+            scene: Default::default(),
+            visibility,
+            inherited_visibility: InheritedVisibility::default(),
+            view_visibility: ViewVisibility::default(),
         }
     }
 }
@@ -108,6 +152,10 @@ impl Plugin for PlayerPlugins {
             .add_systems(OnEnter(GameState::LoadingPlayer), spawn_player)
             .add_systems(
                 Update,
+                play_idle_animation_on_load.run_if(in_state(GameState::InGame)),
+            )
+            .add_systems(
+                Update,
                 (
                     player_movement,
                     PlayerAction::fly.pipe(player_abilities),
@@ -158,10 +206,57 @@ impl PlayerBundle {
     }
 }
 
-fn spawn_player(mut commands: Commands, mut state: ResMut<NextState<GameState>>) {
-    commands.spawn(PlayerBundle::default());
+fn spawn_player(
+    mut commands: Commands,
+    mut player_assets: ResMut<PlayerAssets>,
+    mut graphs: ResMut<Assets<AnimationGraph>>,
+    mut state: ResMut<NextState<GameState>>,
+) {
+    let player = commands
+        .spawn(PlayerBundle {
+            scene: player_assets.player.clone(),
+            ..default()
+        })
+        .id();
+
+    // Build the animation graph
+    let mut graph = AnimationGraph::new();
+    let idle_animation = graph.add_clip(player_assets.idle_animation.clone(), 1.0, graph.root);
+    player_assets.animations.insert(PlayerAnimation::Idle, idle_animation);
+
+    // Insert a resource with the current scene information
+    let graph = graphs.add(graph);
+    player_assets.animation_graph = graph;
+
+    // Add Animation Player to the player entity
+    commands.entity(player).insert(AnimationPlayer::default());
     // Player is loaded, now we can set the game state to InGame
     state.set(GameState::InGame);
+}
+
+// Once the Player is loaded, we run the idle animation
+fn play_idle_animation_on_load(
+    mut commands: Commands,
+    player_assets: Res<PlayerAssets>,
+    mut players: Query<(Entity, &mut AnimationPlayer), Added<AnimationPlayer>>,
+) {
+    bevy::log::debug_once!("Running play_idle_animation_on_load");
+    for (entity, mut player) in &mut players {
+        bevy::log::debug!("Playing idle animation on load");
+        let mut transitions = AnimationTransitions::new();
+
+        // Make sure to start the animation via the `AnimationTransitions`
+        // component. The `AnimationTransitions` component wants to manage all
+        // the animations and will get confused if the animations are started
+        // directly via the `AnimationPlayer`.
+        let idle_animation = player_assets.animations[&PlayerAnimation::Idle];
+        transitions.play(&mut player, idle_animation, Duration::ZERO).repeat();
+
+        commands
+            .entity(entity)
+            .insert(player_assets.animation_graph.clone())
+            .insert(transitions);
+    }
 }
 
 /// Moves the player using WASD in 3D space

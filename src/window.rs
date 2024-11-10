@@ -12,7 +12,8 @@ impl Plugin for CustomizedWindowPlugin {
             primary_window: Some(Window {
                 title: "Project Z".into(),
                 name: Some("shekohex.project_z".into()),
-                resolution: (800., 600.).into(),
+                // TODO: Set the resolution to an appropriate value
+                resolution: (800., 1000.).into(),
                 position: WindowPosition::At(IVec2::new(1111, 0)),
                 present_mode: PresentMode::AutoVsync,
                 focused: true,

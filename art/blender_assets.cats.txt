@@ -1,0 +1,10 @@
+# This is an Asset Catalog Definition file for Blender.
+#
+# Empty lines and lines starting with `#` will be ignored.
+# The first non-ignored line should be the version indicator.
+# Other lines are of the format "UUID:catalog/path/for/assets:simple catalog name"
+
+VERSION 1
+
+c1d9d4b4-3bca-46c1-a0ad-192634533198:Xbot:Xbot
+e5594321-0b40-4941-81ae-c06d72323a9f:Xbot/Mats:Xbot-Mats
