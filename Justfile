@@ -13,7 +13,7 @@ run: dev play
 [group('run')]
 [private]
 [windows]
-play $WGPU_BACKEND="dx12" $RUST_LOG="wgpu=error,bevy_render=info,bevy_ecs=info,project_z=debug":
+play $WGPU_BACKEND="dx12" $RUST_LOG="info,wgpu=error,naga=warn,project_z=debug":
   cargo run -F dev
 
 [group('run')]

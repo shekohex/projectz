@@ -229,7 +229,7 @@ fn spawn_player(
     player_assets.animation_graph = graph;
 
     // Add Animation Player to the player entity
-    commands.entity(player).insert(AnimationPlayer::default());
+    // commands.entity(player).insert(AnimationPlayer::default());
     // Player is loaded, now we can set the game state to InGame
     state.set(GameState::InGame);
 }
