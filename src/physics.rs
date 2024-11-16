@@ -22,5 +22,5 @@ impl PluginGroup for GamePhysicsPlugins {
 
 /// A Simple function plugin that adds/updates the gravity of the game.
 fn gravity_plugin(app: &mut App) {
-    app.insert_resource(Gravity(Vector::NEG_Y * 1000.0));
+    app.insert_resource(Gravity(Vector::NEG_Y * 9.8));
 }

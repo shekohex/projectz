@@ -1,11 +1,14 @@
 //! Player Related Code
 
 use crate::prelude::*;
-
+use avian3d::prelude::*;
 use bevy::prelude::*;
 use bevy::utils::{Duration, HashMap};
 use bevy_asset_loader::prelude::*;
 use leafwing_input_manager::prelude::*;
+use std::ops::Add;
+use std::str::FromStr;
+
 /// Player Plugin to organize player related systems
 pub struct PlayerPlugins;
 
@@ -16,27 +19,16 @@ pub struct Player;
 
 #[derive(AssetCollection, Resource)]
 pub struct PlayerAssets {
-    #[asset(path = "meshes/xbot.gltf#Scene0")]
-    pub player: Handle<Scene>,
-    #[asset(path = "ani/idle.gltf#Animation0")]
-    pub idle_animation: Handle<AnimationClip>,
-
-    pub animation_graph: Handle<AnimationGraph>,
-
-    /// Player animations
-    pub animations: HashMap<PlayerAnimation, AnimationNodeIndex>,
+    /// X-Bot Skeleton with animations
+    #[asset(path = "meshes/man.gltf")]
+    pub skeleton: Handle<Gltf>,
 }
 
-#[derive(Default, Debug, Clone, Eq, PartialEq, Hash)]
-pub enum PlayerAnimation {
-    #[default]
-    Idle,
-    Walk,
-    Run,
-    Jump,
-    Fall,
-    Fly,
-    Land,
+#[derive(Debug, Resource, Default, Reflect)]
+#[reflect(Debug)]
+struct PlayerAnimations {
+    pub animations: HashMap<PlayerAnimation, AnimationNodeIndex>,
+    pub animation_graph: Handle<AnimationGraph>,
 }
 
 #[derive(Bundle)]
@@ -45,20 +37,22 @@ struct PlayerBundle {
     // This bundle must be added to your player entity
     // (or whatever else you wish to control)
     input_manager: InputManagerBundle<PlayerAction>,
-    // Player Mesh
+    /// Player Skeleton
+    skeleton: Handle<Gltf>,
+    /// Player Mesh
     scene: Handle<Scene>,
-    // Player Transform
+    /// Player Transform
     transform: Transform,
-    // Player Global Transform
+    /// Player Global Transform
     global_transform: GlobalTransform,
-    // Player Tag
+    /// Player Tag
     player: Player,
-    /// User-driven visibility of the scene root entity.
-    pub visibility: Visibility,
-    /// Inherited visibility of the scene root entity.
-    pub inherited_visibility: InheritedVisibility,
-    /// Algorithmically-computed visibility of the scene root entity for rendering.
-    pub view_visibility: ViewVisibility,
+    /// Player Visibility
+    visibility: VisibilityBundle,
+    /// Rigid Body
+    rigid_body: RigidBody,
+    /// Collider
+    collider: Collider,
 }
 
 /// A run condition that is always false
@@ -69,8 +63,7 @@ const fn never() -> bool {
 
 impl Default for PlayerBundle {
     fn default() -> Self {
-        let transform = Transform::from_xyz(-2.5, 2.5, 2.5);
-        let visibility = Visibility::Inherited;
+        let transform = Transform::from_xyz(0.0, 2.5, 0.0);
         Self {
             name: Name::new("Player"),
             input_manager: InputManagerBundle::with_map(Self::default_input_map()),
@@ -78,9 +71,10 @@ impl Default for PlayerBundle {
             global_transform: GlobalTransform::from(transform),
             player: Player,
             scene: Default::default(),
-            visibility,
-            inherited_visibility: InheritedVisibility::default(),
-            view_visibility: ViewVisibility::default(),
+            skeleton: Default::default(),
+            visibility: VisibilityBundle::default(),
+            rigid_body: RigidBody::Kinematic,
+            collider: Collider::capsule(0.5, 2.5),
         }
     }
 }
@@ -98,6 +92,15 @@ enum PlayerAction {
     Run,
     Fly,
     Decent,
+}
+
+#[derive(PartialEq, Eq, Clone, Copy, Hash, Debug, Reflect, strum::EnumIs, strum::EnumString)]
+#[reflect(Debug)]
+#[repr(u16)]
+enum PlayerAnimation {
+    FastRunning,
+    Walking,
+    Idle,
 }
 
 impl PlayerAction {
@@ -121,6 +124,16 @@ impl PlayerAction {
             PlayerAction::Decent => Some(Dir3::NEG_Y),
 
             _ => None,
+        }
+    }
+
+    fn angle(self) -> f32 {
+        match self {
+            PlayerAction::Up => 270.0,
+            PlayerAction::Down => 90.0,
+            PlayerAction::Left => 0.0,
+            PlayerAction::Right => 180.0,
+            _ => 0.0,
         }
     }
 
@@ -148,12 +161,11 @@ impl Plugin for PlayerPlugins {
     fn build(&self, app: &mut App) {
         app.register_type::<Player>()
             .register_type::<PlayerAction>()
+            .register_type::<PlayerAnimation>()
+            .register_type::<PlayerAnimations>()
             .add_plugins(InputManagerPlugin::<PlayerAction>::default())
             .add_systems(OnEnter(GameState::LoadingPlayer), spawn_player)
-            .add_systems(
-                Update,
-                play_idle_animation_on_load.run_if(in_state(GameState::InGame)),
-            )
+            .observe(animation_player_added)
             .add_systems(
                 Update,
                 (
@@ -161,6 +173,7 @@ impl Plugin for PlayerPlugins {
                     PlayerAction::fly.pipe(player_abilities),
                     PlayerAction::decent.pipe(player_abilities),
                     PlayerAction::jump.pipe(player_abilities),
+                    player_animations,
                     move_camera_with_player,
                     move_light_with_player,
                 )
@@ -206,57 +219,69 @@ impl PlayerBundle {
     }
 }
 
+#[tracing::instrument(skip_all)]
 fn spawn_player(
     mut commands: Commands,
-    mut player_assets: ResMut<PlayerAssets>,
-    mut graphs: ResMut<Assets<AnimationGraph>>,
+    gltf_assets: Res<Assets<Gltf>>,
+    player_assets: ResMut<PlayerAssets>,
+    mut animation_graphs: ResMut<Assets<AnimationGraph>>,
     mut state: ResMut<NextState<GameState>>,
 ) {
-    let player = commands
-        .spawn(PlayerBundle {
-            scene: player_assets.player.clone(),
-            ..default()
-        })
-        .id();
+    let Some(skeleton) = gltf_assets.get(&player_assets.skeleton) else {
+        return;
+    };
 
-    // Build the animation graph
-    let mut graph = AnimationGraph::new();
-    let idle_animation = graph.add_clip(player_assets.idle_animation.clone(), 1.0, graph.root);
-    player_assets.animations.insert(PlayerAnimation::Idle, idle_animation);
+    commands.spawn(PlayerBundle {
+        scene: skeleton.named_scenes.get("Library").expect("No scene named 'Library'").clone(),
+        skeleton: player_assets.skeleton.clone(),
+        ..default()
+    });
 
-    // Insert a resource with the current scene information
-    let graph = graphs.add(graph);
-    player_assets.animation_graph = graph;
+    let mut player_animations = PlayerAnimations::default();
+    let mut animation_graph = AnimationGraph::new();
+    for named_animation in skeleton.named_animations.iter() {
+        let Ok(animation) = PlayerAnimation::from_str(named_animation.0) else {
+            bevy::log::error!(animation = %named_animation.0, "Encountered an unknown animation");
+            continue;
+        };
+        bevy::log::debug!(animation = %named_animation.0, "Adding animation");
+        let node_index =
+            animation_graph.add_clip(named_animation.1.clone_weak(), 1.0, animation_graph.root);
+        player_animations.animations.insert(animation, node_index);
+    }
 
-    // Add Animation Player to the player entity
-    // commands.entity(player).insert(AnimationPlayer::default());
+    player_animations.animation_graph = animation_graphs.add(animation_graph);
+
+    commands.insert_resource(player_animations);
+
     // Player is loaded, now we can set the game state to InGame
     state.set(GameState::InGame);
 }
 
-// Once the Player is loaded, we run the idle animation
-fn play_idle_animation_on_load(
+/// System that runs when an `AnimationPlayer` is added to an entity
+#[tracing::instrument(skip_all)]
+fn animation_player_added(
+    trigger: Trigger<OnAdd, AnimationPlayer>,
     mut commands: Commands,
-    player_assets: Res<PlayerAssets>,
-    mut players: Query<(Entity, &mut AnimationPlayer), Added<AnimationPlayer>>,
+    player_animations: Res<PlayerAnimations>,
+    mut animation_players: Query<&mut AnimationPlayer>,
 ) {
-    bevy::log::debug_once!("Running play_idle_animation_on_load");
-    for (entity, mut player) in &mut players {
-        bevy::log::debug!("Playing idle animation on load");
-        let mut transitions = AnimationTransitions::new();
+    let mut transitions = AnimationTransitions::new();
 
-        // Make sure to start the animation via the `AnimationTransitions`
-        // component. The `AnimationTransitions` component wants to manage all
-        // the animations and will get confused if the animations are started
-        // directly via the `AnimationPlayer`.
-        let idle_animation = player_assets.animations[&PlayerAnimation::Idle];
-        transitions.play(&mut player, idle_animation, Duration::ZERO).repeat();
+    transitions
+        .play(
+            &mut animation_players.get_mut(trigger.entity()).unwrap(),
+            player_animations.animations[&PlayerAnimation::Idle],
+            Duration::ZERO,
+        )
+        .repeat();
 
-        commands
-            .entity(entity)
-            .insert(player_assets.animation_graph.clone())
-            .insert(transitions);
-    }
+    commands
+        .entity(trigger.entity())
+        .insert(transitions)
+        .insert(player_animations.animation_graph.clone_weak());
+
+    bevy::log::debug!("Idle animation started");
 }
 
 /// Moves the player using WASD in 3D space
@@ -267,14 +292,16 @@ fn player_movement(
 ) {
     let mut direction = Vec3::ZERO;
     let mut speed = PlayerAction::WALK_SPEED;
-
     for (action_state, mut transform) in query.iter_mut() {
+        let mut rotation = transform.rotation;
         for input_direction in PlayerAction::DIRECTIONS {
             if action_state.pressed(&input_direction) {
                 if let Some(dir) = input_direction.direction() {
                     // Sum the directions as 3D vectors
                     direction += dir.as_vec3();
                 }
+                rotation =
+                    rotation.add(Quat::from_rotation_y(input_direction.angle().to_radians()));
             }
 
             // If we are running, set the speed to the run speed
@@ -287,7 +314,56 @@ fn player_movement(
         if direction.length() > 0.0 {
             direction = direction.normalize();
         }
-        transform.translation += direction * speed * time.delta_seconds();
+        let old_translation = transform.translation;
+
+        let new_translation =
+            old_translation.lerp(old_translation + direction * speed, time.delta_seconds());
+        transform.translation = new_translation;
+
+        let new_rotation = transform.rotation.lerp(rotation, 0.2);
+        transform.rotation = new_rotation;
+    }
+}
+
+#[tracing::instrument(skip_all)]
+fn player_animations(
+    player_animations: Res<PlayerAnimations>,
+    player_action_state_query: Query<&ActionState<PlayerAction>, With<Player>>,
+    mut animations_query: Query<
+        (&mut AnimationTransitions, &mut AnimationPlayer),
+        Changed<AnimationTransitions>,
+    >,
+) {
+    for action_state in &player_action_state_query {
+        for (mut transitions, mut animations_player) in animations_query.iter_mut() {
+            let is_walking =
+                PlayerAction::DIRECTIONS.into_iter().any(|dir| action_state.pressed(&dir));
+            let is_running = action_state.pressed(&PlayerAction::Run);
+            let animation = if is_walking && !is_running {
+                PlayerAnimation::Walking
+            } else if is_walking && is_running {
+                PlayerAnimation::FastRunning
+            } else {
+                PlayerAnimation::Idle
+            };
+
+            // Avoid playing the same animation
+            if let Some(current_animation) = transitions.get_main_animation() {
+                if current_animation == player_animations.animations[&animation] {
+                    continue;
+                }
+            }
+
+            let node_index = player_animations.animations[&animation];
+            transitions
+                .play(
+                    &mut animations_player,
+                    node_index,
+                    Duration::from_millis(250),
+                )
+                .repeat();
+            bevy::log::debug!(animation = ?animation, "Playing animation");
+        }
     }
 }
 

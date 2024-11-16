@@ -1,7 +1,7 @@
-use core::f32::consts::PI;
-
+use avian3d::prelude::{Collider, RigidBody};
 use bevy::prelude::*;
 use bevy_asset_loader::prelude::*;
+use core::f32::consts::PI;
 use project_z::prelude::*;
 
 fn main() {
@@ -39,6 +39,21 @@ fn setup_world(
             ..default()
         },
         Ground,
+        RigidBody::Static,
+        Collider::cuboid(20.0, 0.1, 20.0),
+        Name::from("Ground"),
+    ));
+
+    commands.spawn((
+        PbrBundle {
+            mesh: meshes.add(Cuboid::new(1.0, 1.0, 1.0)),
+            material: materials.add(Color::srgb(0.2, 0.4, 0.3)),
+            transform: Transform::from_translation(Vec3::new(-2.5, 1.5, 2.5)),
+            ..default()
+        },
+        RigidBody::Dynamic,
+        Collider::cuboid(1.0, 1.0, 1.0),
+        Name::from("Cube"),
     ));
 
     // light

@@ -14,6 +14,9 @@ bevy_editor_pls = { version = "0.10", optional = true }
 log = { version = "*", features = ["max_level_debug"] }
 tracing = { version = "*", features = ["max_level_debug"] }
 
+# Utility crates
+strum = { version = "0.26", features = ["derive"] }
+
 # Disable default features for Bevy to reduce compile times.
 [dependencies.bevy]
 version = "0.14"
@@ -29,7 +32,6 @@ features = [
 
   # Enable animation support, and glTF animation loading
   "animation",
-
   # Enables the built-in asset processor for processed assets.
   # "asset_processor", # Enabled in dev profile
 
@@ -42,49 +44,36 @@ features = [
 
   # Provides asset functionality
   "bevy_asset",
-
   # Provides audio functionality
   # "bevy_audio",
 
   # Provides shared color types and operations
   "bevy_color",
-
   # Provides cameras and other basic render pipeline features
   "bevy_core_pipeline",
-
   # Adds gamepad support
   "bevy_gilrs",
-
   # Adds support for rendering gizmos
   "bevy_gizmos",
-
   # glTF support
   "bevy_gltf",
-
   # Adds PBR rendering
   "bevy_pbr",
-
   # Provides rendering functionality
   "bevy_render",
-
   # Provides scene functionality
   "bevy_scene",
-
   # Provides sprite functionality
   # "bevy_sprite",
 
   # Enable built in global state machines
   "bevy_state",
-
   # Provides text functionality
   "bevy_text",
-
   # A custom ECS-driven UI framework
   "bevy_ui",
-
   # winit window and input backend
   "bevy_winit",
-
   # Include a default font, containing only ASCII characters, at the cost of a 20kB binary size increase.
   "default_font", # TODO: Remove this if we goig to use custom font
 
@@ -99,29 +88,22 @@ features = [
 
   # KTX2 compressed texture support
   "ktx2",
-
   # Enables multithreaded parallelism in the engine. Disabling it forces all engine tasks to run on a single thread.
   "multi_threaded",
-
   # MP3 audio format support
   # "mp3",
 
   # PNG image format support
   "png",
-
   # Enable serialization support through serde
   "serialize",
-
   # Include SMAA Look Up Tables KTX2 Files
   "smaa_luts",
-
   # Enables system information diagnostic plugin
   "sysinfo_plugin",
-
   # Include tonemapping Look Up Tables KTX2 files.
   # If everything is pink, you need to enable this feature or change the Tonemapping method on your Camera2dBundle or Camera3dBundle.
   "tonemapping_luts",
-
   # OGG/VORBIS audio format support
   # "vorbis",
 
@@ -130,7 +112,6 @@ features = [
 
   # Wayland display server support
   "wayland",
-
   # Enable some limitations to be able to use WebGL2.
   # "webgl2",
 
