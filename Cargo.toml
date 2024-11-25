@@ -2,20 +2,40 @@
 name = "project-z"
 version = "0.1.0"
 edition = "2021"
+description = "an ~MMO~RPG game made with Bevy"
+publish = false
 
 [dependencies]
+# A Utility for loading assets in Bevy, with support for 3D assets.
 bevy_asset_loader = { version = "0.21", features = ["3d"] }
+# Motion Controller
+bevy-tnua = { version = "0.20.0", default-features = false }
+# Avian3D Integration layer with Bevy Tnua for 3D physics
+bevy-tnua-avian3d = { version = "0.1.1", default-features = false }
+
+# Tilemaps support for Bevy
+bevy_ecs_tilemap = { version = "0.14.0" }
+# Tiled (Map Editor) support for Bevy with bevy_ecs_tilemap
+bevy_ecs_tiled = { version = "0.4.0", git = "https://github.com/shekohex/bevy_ecs_tiled", features = ["user_properties"] }
+
+# Development utilities
 bevy_editor_pls = { version = "0.10", optional = true }
 
+# Winit and Image are used here mainly to set up the window icon.
+# See: https://bevy-cheatbook.github.io/window/icon.html#setting-the-window-icon
+winit = "0.30.5"
+image = { version = "0.25", default-features = false, features = ["png"] }
+
 # Bevy's dependencies do a lot of trace logging that is not relevant for an end user.
-# To improve your runtime performance, we added this
+# To improve your runtime performance, we added that
 # It will disable detailed log levels on compile time so that they do not need
 # to be filtered out while your app is running.
 log = { version = "*", features = ["max_level_debug"] }
 tracing = { version = "*", features = ["max_level_debug"] }
-
+serde = { version = "1.0", features = ["derive"] }
 # Utility crates
 strum = { version = "0.26", features = ["derive"] }
+thiserror = { version = "^1" }
 
 # Disable default features for Bevy to reduce compile times.
 [dependencies.bevy]
@@ -133,15 +153,24 @@ features = [
   # "zstd",
 ]
 
+# Pysicis engine
 [dependencies.avian3d]
 version = "0.1"
 default-features = false
 features = ["3d", "bevy_scene", "f32", "parry-f32", "parallel"]
 
+# Input manager
 [dependencies.leafwing-input-manager]
 version = "0.15"
 default-features = false
 features = ["asset", "ui", "mouse", "keyboard", "gamepad"]
+
+[build-dependencies]
+build-data = "0"
+
+[target.'cfg(windows)'.build-dependencies]
+# Windows specific dependencies
+embed-resource = "3.0"
 
 [features]
 dev = [
@@ -152,6 +181,7 @@ dev = [
   "bevy/bevy_dev_tools",
   "avian3d/debug-plugin",
   "bevy_editor_pls",
+  "bevy_ecs_tiled/debug",
 ]
 ci = ["bevy/bevy_ci_testing"]
 
@@ -189,7 +219,7 @@ codegen-units = 1
 # Default to release profile values.
 inherits = "release"
 # Optimize with size in mind (also try "z", sometimes it is better).
-# Slightly slows compile times, great improvements to file size and runtime performance.
+# Slightly slows compilation times, great improvements to file size and runtime performance.
 opt-level = "s"
 # Strip all debugging information from the binary to slightly reduce file size.
 strip = "debuginfo"

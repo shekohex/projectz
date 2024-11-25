@@ -3,4 +3,6 @@
 .idea
 *.blend1
 *.*~
+*.bak
 .DS_Store
+/screenshots
