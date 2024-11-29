@@ -22,7 +22,6 @@ impl Plugin for PlayerPlugins {
   fn build(&self, app: &mut App) {
     app
       .register_type::<Player>()
-      .register_type::<Player2D>()
       .add_systems(
         Update,
         spawn_player.run_if(in_state(GameState::LoadingPlayer)),
@@ -31,7 +30,7 @@ impl Plugin for PlayerPlugins {
       .add_plugins(animations::PlayerAnimationsPlugin)
       .add_systems(
         PostUpdate,
-        (move_camera3d_with_player, move_camera2d_with_player)
+        move_camera3d_with_player
           .after(PhysicsSet::Sync)
           .before(TransformSystem::TransformPropagate)
           .run_if(in_state(GameState::InGame)),
@@ -43,11 +42,6 @@ impl Plugin for PlayerPlugins {
 #[derive(Component, Reflect, Default, Debug, Clone)]
 #[reflect(Component)]
 pub struct Player;
-
-/// A tag component for the player 2D View
-#[derive(Component, Reflect, Default, Debug, Clone)]
-#[reflect(Component)]
-pub struct Player2D;
 
 #[derive(AssetCollection, Resource)]
 pub struct PlayerAssets {
@@ -81,7 +75,7 @@ struct Player3DBundle {
   locked_axes: LockedAxes,
 }
 
-/// A run condition that is always false
+/// A run condition that's always false
 #[allow(unused)]
 const fn never() -> bool {
   false
@@ -110,39 +104,11 @@ fn spawn_player(
   mut commands: Commands,
   gltf_assets: Res<Assets<Gltf>>,
   player_assets: ResMut<PlayerAssets>,
-  spawn_points: Query<(&Transform, &SpawnPoint)>,
-  virtual_3d_view: Res<Virtual3DRenderView>,
   mut state: ResMut<NextState<GameState>>,
 ) {
   let Some(gltf) = gltf_assets.get(&player_assets.skeleton) else {
     return;
   };
-
-  let maybe_player_spawn_point = spawn_points.iter().find_map(|(pos, spawn_point)| {
-    debug!(at = %pos.translation, kind = ?spawn_point.kind, "spawn point found");
-    if spawn_point.kind == SpawnPointKind::Player {
-      Some(pos.translation)
-    } else {
-      None
-    }
-  });
-
-  let Some(player_spawn_point) = maybe_player_spawn_point else {
-    debug!("No player spawn point found, trying again later ..");
-    return;
-  };
-
-  debug!(at = %player_spawn_point, "Player spawn point found");
-  let transform = Transform::from_translation(player_spawn_point);
-  commands.spawn((
-    SpriteBundle {
-      texture: virtual_3d_view.image.clone(),
-      transform,
-      ..default()
-    },
-    Player2D,
-    Name::new("Player 2D"),
-  ));
 
   commands.spawn(Player3DBundle {
     scene: SceneBundle {
@@ -154,7 +120,7 @@ fn spawn_player(
     ..default()
   });
 
-  // Player is loaded, now we can set the game state to InGame
+  // Player is loaded, now can set the game state to InGame
   state.set(GameState::InGame);
 }
 
@@ -162,23 +128,11 @@ fn spawn_player(
 /// With a smooth transition
 fn move_camera3d_with_player(
   query: Query<&Transform, (With<Player>, Without<Primary3DCamera>)>,
-  mut camera_query: Query<&mut Transform, With<Primary3DCamera>>,
+  mut camera3d_query: Query<&mut Transform, With<Primary3DCamera>>,
 ) {
-  for mut camera_transform in &mut camera_query {
+  for mut camera_transform in &mut camera3d_query {
     for player_transform in &query {
       let n = player_transform.translation + Vec3::new(6.0, 6.0, 6.0);
-      camera_transform.translation = n;
-    }
-  }
-}
-/// Moves the 2D camera with the player.
-fn move_camera2d_with_player(
-  query: Query<&Transform, (With<Player2D>, Without<Primary2DCamera>)>,
-  mut camera_query: Query<&mut Transform, With<Primary2DCamera>>,
-) {
-  for mut camera_transform in &mut camera_query {
-    for player_transform in &query {
-      let n = player_transform.translation.with_z(1.0);
       camera_transform.translation = n;
     }
   }

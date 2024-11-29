@@ -13,11 +13,6 @@ bevy-tnua = { version = "0.20.0", default-features = false }
 # Avian3D Integration layer with Bevy Tnua for 3D physics
 bevy-tnua-avian3d = { version = "0.1.1", default-features = false }
 
-# Tilemaps support for Bevy
-bevy_ecs_tilemap = { version = "0.14.0" }
-# Tiled (Map Editor) support for Bevy with bevy_ecs_tilemap
-bevy_ecs_tiled = { version = "0.4.0", git = "https://github.com/shekohex/bevy_ecs_tiled", features = ["user_properties"] }
-
 # Development utilities
 bevy_editor_pls = { version = "0.10", optional = true }
 
@@ -26,9 +21,9 @@ bevy_editor_pls = { version = "0.10", optional = true }
 winit = "0.30.5"
 image = { version = "0.25", default-features = false, features = ["png"] }
 
-# Bevy's dependencies do a lot of trace logging that is not relevant for an end user.
-# To improve your runtime performance, we added that
-# It will disable detailed log levels on compile time so that they do not need
+# Bevy's dependencies do a lot of trace logging that isn't relevant for an end user.
+# To improve your runtime performance, added that
+# It'll turn off detailed log levels on compile time so that they don't need
 # to be filtered out while your app is running.
 log = { version = "*", features = ["max_level_debug"] }
 tracing = { version = "*", features = ["max_level_debug"] }
@@ -79,22 +74,21 @@ features = [
   "bevy_gltf",
   # Adds PBR rendering
   "bevy_pbr",
-  # Provides rendering functionality
+  # Provides rendering capability
   "bevy_render",
-  # Provides scene functionality
+  # Provides scene capability
   "bevy_scene",
-  # Provides sprite functionality
-  # "bevy_sprite",
-
+  # Provides sprite capability
+  "bevy_sprite",
   # Enable built in global state machines
   "bevy_state",
-  # Provides text functionality
+  # Provides text capability
   "bevy_text",
   # A custom ECS-driven UI framework
   "bevy_ui",
   # winit window and input backend
   "bevy_winit",
-  # Include a default font, containing only ASCII characters, at the cost of a 20kB binary size increase.
+  # Include a default font containing only ASCII characters at the cost of a 20kB binary size increase.
   "default_font", # TODO: Remove this if we goig to use custom font
 
   # DDS compressed texture support
@@ -181,7 +175,6 @@ dev = [
   "bevy/bevy_dev_tools",
   "avian3d/debug-plugin",
   "bevy_editor_pls",
-  "bevy_ecs_tiled/debug",
 ]
 ci = ["bevy/bevy_ci_testing"]
 

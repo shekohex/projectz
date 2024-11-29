@@ -49,12 +49,13 @@ fn set_window_icon(
   // we have to use `NonSend` here
   windows: NonSend<WinitWindows>,
 ) {
-  // here we use the `image` crate to load our icon data from a png file
-  // this is not a very bevy-native solution, but it will do
+  // here use the `image` crate to load icon data from a png file
+  // this isn't a very bevy-native solution, but it'll do
   let (icon_rgba, icon_width, icon_height) = {
-    let image = image::open("art/projectz_icon.png")
-      .expect("Failed to open icon path")
-      .into_rgba8();
+    let assets_path = std::path::PathBuf::from(env!("ASSETS_DIR"));
+    let icon_path = assets_path.join("..").join("art").join("projectz_icon.png");
+    eprintln!("Loading icon from path: {}", icon_path.display());
+    let image = image::open(icon_path).expect("Failed to open icon path").into_rgba8();
     let (width, height) = image.dimensions();
     let rgba = image.into_raw();
     (rgba, width, height)

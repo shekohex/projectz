@@ -3,14 +3,14 @@ use project_z::prelude::*;
 
 fn main() {
   App::new()
-    .add_plugins((
+    .add_plugins(
       DefaultPlugins
         .build()
         .disable::<WindowPlugin>()
         .set(ImagePlugin::default_nearest())
         .add(CustomizedWindowPlugin),
-      GamePhysicsPlugins,
-    ))
+    )
+    .add_plugins(GamePhysicsPlugins)
     .init_state::<GameState>()
     .add_plugins(AssetsPlugin)
     .add_plugins(DevPlugins)

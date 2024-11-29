@@ -126,7 +126,7 @@ dependencies = [
  "ndk-context",
  "ndk-sys 0.6.0+11769913",
  "num_enum",
- "thiserror 1.0.65",
+ "thiserror",
 ]
 
 [[package]]
@@ -389,7 +389,7 @@ checksum = "031a91dc27caff8cfe5604125d69a3d521c25a91a424707162c7ffa3b0537b2a"
 dependencies = [
  "bevy",
  "bevy-tnua-physics-integration-layer",
- "thiserror 1.0.65",
+ "thiserror",
 ]
 
 [[package]]
@@ -449,7 +449,7 @@ dependencies = [
  "petgraph",
  "ron",
  "serde",
- "thiserror 1.0.65",
+ "thiserror",
  "thread_local",
  "uuid",
 ]
@@ -467,7 +467,7 @@ dependencies = [
  "bevy_utils",
  "console_error_panic_hook",
  "downcast-rs",
- "thiserror 1.0.65",
+ "thiserror",
  "wasm-bindgen",
  "web-sys",
 ]
@@ -498,7 +498,7 @@ dependencies = [
  "parking_lot",
  "ron",
  "serde",
- "thiserror 1.0.65",
+ "thiserror",
  "uuid",
  "wasm-bindgen",
  "wasm-bindgen-futures",
@@ -551,7 +551,7 @@ dependencies = [
  "bytemuck",
  "encase",
  "serde",
- "thiserror 1.0.65",
+ "thiserror",
  "wgpu-types",
 ]
 
@@ -592,7 +592,7 @@ dependencies = [
  "radsort",
  "serde",
  "smallvec",
- "thiserror 1.0.65",
+ "thiserror",
 ]
 
 [[package]]
@@ -679,7 +679,7 @@ dependencies = [
  "nonmax",
  "petgraph",
  "serde",
- "thiserror 1.0.65",
+ "thiserror",
 ]
 
 [[package]]
@@ -692,32 +692,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.89",
-]
-
-[[package]]
-name = "bevy_ecs_tiled"
-version = "0.4.0"
-source = "git+https://github.com/shekohex/bevy_ecs_tiled#79223740b3529a10c2270bdccbd0af738f6eba3b"
-dependencies = [
- "bevy",
- "bevy_ecs_tilemap",
- "futures-lite",
- "log",
- "serde",
- "serde_json",
- "thiserror 2.0.3",
- "tiled",
-]
-
-[[package]]
-name = "bevy_ecs_tilemap"
-version = "0.14.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d880047f5deaf5166ffc08238125a4ccbd2837f781ca6525fa200fcf5785ba3b"
-dependencies = [
- "bevy",
- "log",
- "regex",
 ]
 
 [[package]]
@@ -806,7 +780,7 @@ dependencies = [
  "bevy_time",
  "bevy_utils",
  "gilrs",
- "thiserror 1.0.65",
+ "thiserror",
 ]
 
 [[package]]
@@ -872,7 +846,7 @@ dependencies = [
  "serde",
  "serde_json",
  "smallvec",
- "thiserror 1.0.65",
+ "thiserror",
 ]
 
 [[package]]
@@ -902,7 +876,7 @@ dependencies = [
  "bevy_utils",
  "serde",
  "smol_str",
- "thiserror 1.0.65",
+ "thiserror",
 ]
 
 [[package]]
@@ -984,7 +958,7 @@ dependencies = [
  "rand",
  "serde",
  "smallvec",
- "thiserror 1.0.65",
+ "thiserror",
 ]
 
 [[package]]
@@ -1062,7 +1036,7 @@ dependencies = [
  "serde",
  "smallvec",
  "smol_str",
- "thiserror 1.0.65",
+ "thiserror",
  "uuid",
 ]
 
@@ -1122,7 +1096,7 @@ dependencies = [
  "send_wrapper",
  "serde",
  "smallvec",
- "thiserror 1.0.65",
+ "thiserror",
  "wasm-bindgen",
  "web-sys",
  "wgpu",
@@ -1156,7 +1130,7 @@ dependencies = [
  "bevy_transform",
  "bevy_utils",
  "serde",
- "thiserror 1.0.65",
+ "thiserror",
  "uuid",
 ]
 
@@ -1183,7 +1157,7 @@ dependencies = [
  "guillotiere",
  "radsort",
  "rectangle-pack",
- "thiserror 1.0.65",
+ "thiserror",
 ]
 
 [[package]]
@@ -1245,7 +1219,7 @@ dependencies = [
  "bevy_window",
  "glyph_brush_layout",
  "serde",
- "thiserror 1.0.65",
+ "thiserror",
 ]
 
 [[package]]
@@ -1260,7 +1234,7 @@ dependencies = [
  "bevy_utils",
  "crossbeam-channel",
  "serde",
- "thiserror 1.0.65",
+ "thiserror",
 ]
 
 [[package]]
@@ -1275,7 +1249,7 @@ dependencies = [
  "bevy_math",
  "bevy_reflect",
  "serde",
- "thiserror 1.0.65",
+ "thiserror",
 ]
 
 [[package]]
@@ -1306,7 +1280,7 @@ dependencies = [
  "serde",
  "smallvec",
  "taffy",
- "thiserror 1.0.65",
+ "thiserror",
 ]
 
 [[package]]
@@ -1528,7 +1502,7 @@ dependencies = [
  "polling",
  "rustix",
  "slab",
- "thiserror 1.0.65",
+ "thiserror",
 ]
 
 [[package]]
@@ -2019,7 +1993,7 @@ dependencies = [
  "const_panic",
  "encase_derive",
  "glam 0.27.0",
- "thiserror 1.0.65",
+ "thiserror",
 ]
 
 [[package]]
@@ -2494,7 +2468,7 @@ checksum = "6f56f6318968d03c18e1bcf4857ff88c61157e9da8e47c5f29055d60e1228884"
 dependencies = [
  "log",
  "presser",
- "thiserror 1.0.65",
+ "thiserror",
  "winapi",
  "windows 0.52.0",
 ]
@@ -2562,7 +2536,7 @@ dependencies = [
  "com",
  "libc",
  "libloading 0.8.5",
- "thiserror 1.0.65",
+ "thiserror",
  "widestring",
  "winapi",
 ]
@@ -2743,7 +2717,7 @@ dependencies = [
  "combine",
  "jni-sys",
  "log",
- "thiserror 1.0.65",
+ "thiserror",
  "walkdir",
  "windows-sys 0.45.0",
 ]
@@ -3060,7 +3034,7 @@ dependencies = [
  "rustc-hash",
  "spirv",
  "termcolor",
- "thiserror 1.0.65",
+ "thiserror",
  "unicode-xid",
 ]
 
@@ -3079,7 +3053,7 @@ dependencies = [
  "regex",
  "regex-syntax 0.8.5",
  "rustc-hash",
- "thiserror 1.0.65",
+ "thiserror",
  "tracing",
  "unicode-ident",
 ]
@@ -3124,7 +3098,7 @@ dependencies = [
  "ndk-sys 0.6.0+11769913",
  "num_enum",
  "raw-window-handle",
- "thiserror 1.0.65",
+ "thiserror",
 ]
 
 [[package]]
@@ -3813,8 +3787,6 @@ dependencies = [
  "bevy-tnua",
  "bevy-tnua-avian3d",
  "bevy_asset_loader",
- "bevy_ecs_tiled",
- "bevy_ecs_tilemap",
  "bevy_editor_pls",
  "build-data",
  "embed-resource",
@@ -3823,7 +3795,7 @@ dependencies = [
  "log",
  "serde",
  "strum",
- "thiserror 1.0.65",
+ "thiserror",
  "tracing",
  "winit",
 ]
@@ -4274,7 +4246,7 @@ dependencies = [
  "log",
  "memmap2",
  "rustix",
- "thiserror 1.0.65",
+ "thiserror",
  "wayland-backend",
  "wayland-client",
  "wayland-csd-frame",
@@ -4419,16 +4391,7 @@ version = "1.0.65"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5d11abd9594d9b38965ef50805c5e469ca9cc6f197f883f717e0269a3057b3d5"
 dependencies = [
- "thiserror-impl 1.0.65",
-]
-
-[[package]]
-name = "thiserror"
-version = "2.0.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c006c85c7651b3cf2ada4584faa36773bd07bac24acfb39f3c431b36d7e667aa"
-dependencies = [
- "thiserror-impl 2.0.3",
+ "thiserror-impl",
 ]
 
 [[package]]
@@ -4436,17 +4399,6 @@ name = "thiserror-impl"
 version = "1.0.65"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ae71770322cbd277e69d762a16c444af02aa0575ac0d174f0b9562d3b37f8602"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.89",
-]
-
-[[package]]
-name = "thiserror-impl"
-version = "2.0.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f077553d607adc1caf65430528a576c757a71ed73944b66ebb58ef2bbd243568"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -4472,18 +4424,6 @@ dependencies = [
  "flate2",
  "jpeg-decoder",
  "weezl",
-]
-
-[[package]]
-name = "tiled"
-version = "0.13.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c7bce2748ed610d57d8963b78469cb8abe4d7c4c361c910a60d3642e381a0fc7"
-dependencies = [
- "base64 0.22.1",
- "flate2",
- "xml-rs",
- "zstd",
 ]
 
 [[package]]
@@ -5082,7 +5022,7 @@ dependencies = [
  "raw-window-handle",
  "rustc-hash",
  "smallvec",
- "thiserror 1.0.65",
+ "thiserror",
  "web-sys",
  "wgpu-hal",
  "wgpu-types",
@@ -5126,7 +5066,7 @@ dependencies = [
  "renderdoc-sys",
  "rustc-hash",
  "smallvec",
- "thiserror 1.0.65",
+ "thiserror",
  "wasm-bindgen",
  "web-sys",
  "wgpu-types",
@@ -5699,32 +5639,4 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.89",
-]
-
-[[package]]
-name = "zstd"
-version = "0.13.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fcf2b778a664581e31e389454a7072dab1647606d44f7feea22cd5abb9c9f3f9"
-dependencies = [
- "zstd-safe",
-]
-
-[[package]]
-name = "zstd-safe"
-version = "7.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "54a3ab4db68cea366acc5c897c7b4d4d1b8994a9cd6e6f841f8964566a419059"
-dependencies = [
- "zstd-sys",
-]
-
-[[package]]
-name = "zstd-sys"
-version = "2.0.13+zstd.1.5.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "38ff0f21cfee8f97d94cef41359e0c89aa6113028ab0291aa8ca0038995a95aa"
-dependencies = [
- "cc",
- "pkg-config",
 ]

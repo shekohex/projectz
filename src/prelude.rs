@@ -14,14 +14,12 @@ pub use self::states::*;
 
 /// Player prelude.
 mod player {
-  pub use crate::player::{Player, Player2D, PlayerAssets, PlayerPlugins};
+  pub use crate::player::{Player, PlayerAssets, PlayerPlugins};
 }
 
 /// Camera prelude.
 mod camera {
-  pub use crate::camera::{
-    GameCameraPlugin, Primary2DCamera, Primary3DCamera, Virtual3DRenderView,
-  };
+  pub use crate::camera::{GameCameraPlugin, Primary3DCamera};
 }
 
 /// Asset prelude.
@@ -36,6 +34,5 @@ mod states {
 
 /// Environment prelude.
 mod environment {
-  pub use crate::environment::props::{SpawnPoint, SpawnPointKind};
-  pub use crate::environment::{EnvironmentMapsAssets, EnvironmentPlugin};
+  pub use crate::environment::EnvironmentPlugin;
 }

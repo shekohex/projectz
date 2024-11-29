@@ -19,7 +19,7 @@ impl Plugin for PlayerInputPlugin {
       .add_plugins(TnuaControllerPlugin::default())
       .add_systems(
         Update,
-        (player_3d_movement, player_2d_movement, player_jump).in_set(TnuaUserControlsSystemSet),
+        (player_3d_movement, player_jump).in_set(TnuaUserControlsSystemSet),
       );
   }
 }
@@ -45,7 +45,7 @@ impl PlayerAction {
   ];
 
   /// The speed of the player when walking
-  pub const WALK_SPEED: f32 = 3.0;
+  pub const WALK_SPEED: f32 = 4.0;
   /// The speed of the player when running
   pub const RUN_SPEED: f32 = Self::WALK_SPEED * 1.5;
 
@@ -56,16 +56,6 @@ impl PlayerAction {
       PlayerAction::Left => Some(Dir3::NEG_X),
       PlayerAction::Right => Some(Dir3::X),
       PlayerAction::Jump => Some(Dir3::Y),
-      _ => None,
-    }
-  }
-
-  fn direction_2d(self) -> Option<Dir2> {
-    match self {
-      PlayerAction::Up => Some(Dir2::Y),
-      PlayerAction::Down => Some(Dir2::NEG_Y),
-      PlayerAction::Left => Some(Dir2::NEG_X),
-      PlayerAction::Right => Some(Dir2::X),
       _ => None,
     }
   }
@@ -108,7 +98,7 @@ pub fn default_map() -> InputMap<PlayerAction> {
 
 // ====== Systems ======
 
-/// Moves the player using WASD in 3D space
+/// Moves the player using `WASD` in 3D space
 /// With a smooth transition
 fn player_3d_movement(
   mut query: Query<(&ActionState<PlayerAction>, &mut TnuaController), With<Player>>,
@@ -130,59 +120,25 @@ fn player_3d_movement(
       }
     }
 
-    // If we pressed multiple keys, normalize the direction so we don't move faster diagonally
+    // If pressed multiple keys, normalize the direction so don't move faster diagonally
     if direction.length() > 0.0 {
       direction = direction.normalize();
     }
 
     // Feed the basis every frame. Even if the player doesn't move - just use `desired_velocity:
-    // Vec3::ZERO`. `TnuaController` starts without a basis, which will make the character collider
+    // `Vec3::ZERO`. `TnuaController` starts without a basis, which will make the character collider
     // fall.
     controller.basis(TnuaBuiltinWalk {
       // The `desired_velocity` determines how the character will move.
       desired_velocity: direction * speed,
       desired_forward: Dir3::new(direction.neg()).ok(),
-      // The `float_height` must be greater (even if by little) from the distance between the
+      // The `float_height` must be greater even if by little from the distance between the
       // character's center and the lowest point of its collider.
       float_height: 1.5,
       // `TnuaBuiltinWalk` has many other fields for customizing the movement - but they have
       // sensible defaults. Refer to the `TnuaBuiltinWalk`'s documentation to learn what they do.
       ..default()
     });
-  }
-}
-
-/// Moves the player using WASD in 2D space
-/// With a smooth transition
-fn player_2d_movement(
-  mut query_3d: Query<&ActionState<PlayerAction>, With<Player>>,
-  mut query_2d: Query<&mut Transform, With<Player2D>>,
-) {
-  let mut direction = Vec2::ZERO;
-  let mut speed = PlayerAction::WALK_SPEED;
-  for action_state in query_3d.iter_mut() {
-    for input_direction in PlayerAction::DIRECTIONS {
-      if action_state.pressed(&input_direction) {
-        if let Some(dir) = input_direction.direction_2d() {
-          // Sum the directions as 2D vectors
-          direction += dir.as_vec2();
-        }
-      }
-
-      // If we are running, set the speed to the run speed
-      if action_state.pressed(&PlayerAction::Run) {
-        speed = PlayerAction::Run.speed();
-      }
-    }
-
-    // If we pressed multiple keys, normalize the direction so we don't move faster diagonally
-    if direction.length() > 0.0 {
-      direction = direction.normalize();
-    }
-
-    for mut transform in query_2d.iter_mut() {
-      transform.translation += direction.extend(0.0) * speed;
-    }
   }
 }
 

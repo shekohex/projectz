@@ -15,7 +15,6 @@ impl Plugin for AssetsPlugin {
       .add_loading_state(
         LoadingState::new(GameState::LoadingAssets)
           .continue_to_state(GameState::LoadingEnvironmentMaps)
-          .load_collection::<EnvironmentMapsAssets>()
           .continue_to_state(GameState::LoadingPlayerAssets)
           .load_collection::<PlayerAssets>()
           .continue_to_state(GameState::AllAssetsLoaded),

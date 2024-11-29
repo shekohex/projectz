@@ -20,7 +20,7 @@ fn log_transitions_plugin(app: &mut bevy::app::App) {
   );
 }
 
-/// A plugin that exits the application when the escape key is pressed
+/// A plugin that exits the app when the escape key is pressed
 #[cfg(feature = "dev")]
 fn exit_on_esc_plugin(app: &mut bevy::app::App) {
   use bevy::prelude::*;
@@ -46,7 +46,6 @@ impl PluginGroup for DevPlugins {
         .add(bevy::diagnostic::FrameTimeDiagnosticsPlugin)
         .add(bevy::dev_tools::fps_overlay::FpsOverlayPlugin::default())
         .add(bevy_editor_pls::EditorPlugin::default())
-        .add(bevy_ecs_tiled::debug::TiledMapDebugPlugin::default())
     }
     #[cfg(not(feature = "dev"))]
     {

@@ -4,16 +4,10 @@ use core::f32::consts::PI;
 
 use avian3d::collision::Collider;
 use avian3d::prelude::RigidBody;
+use bevy::color::palettes::css;
 use bevy::prelude::*;
-use bevy_asset_loader::prelude::*;
-use bevy_ecs_tiled::prelude::*;
-use bevy_ecs_tiled::TiledMapPluginConfig;
-use bevy_ecs_tilemap::prelude::*;
 
 use crate::prelude::*;
-
-/// Custom Map properties for the game environment
-pub mod props;
 
 /// Game Environment Plugin to organize environment related systems
 #[derive(Default, Debug, Copy, Clone)]
@@ -21,25 +15,8 @@ pub struct EnvironmentPlugin;
 
 impl Plugin for EnvironmentPlugin {
   fn build(&self, app: &mut App) {
-    app
-      .add_plugins((
-        TilemapPlugin,
-        TiledMapPlugin(TiledMapPluginConfig {
-          #[cfg(not(feature = "dev"))]
-          tiled_types_export_file: None,
-          #[cfg(feature = "dev")]
-          tiled_types_export_file: Some("target/tiled_types_export.json".into()),
-        }),
-      ))
-      .add_plugins(props::register_properties_plugin)
-      .add_systems(OnEnter(GameState::LoadingWorld), setup_world);
+    app.add_systems(OnEnter(GameState::LoadingWorld), setup_world);
   }
-}
-
-#[derive(AssetCollection, Resource)]
-pub struct EnvironmentMapsAssets {
-  #[asset(path = "maps/desert/desert.tmx")]
-  pub desert: Handle<TiledMap>,
 }
 
 /// A tag component for the ground
@@ -50,27 +27,10 @@ struct Ground;
 /// System to set up the world
 fn setup_world(
   mut commands: Commands,
-  maps: Res<EnvironmentMapsAssets>,
+  mut meshes: ResMut<Assets<Mesh>>,
+  mut materials: ResMut<Assets<StandardMaterial>>,
   mut next_state: ResMut<NextState<GameState>>,
 ) {
-  // Set up our tiled map
-  commands.spawn((
-    TiledMapHandle(maps.desert.clone()),
-    TiledMapSettings {
-      layer_positioning: LayerPositioning::TiledOffset,
-      ..default()
-    },
-    // For isometric maps, it can be useful to tweak bevy_ecs_tilemap render settings.
-    // TilemapRenderSettings provides the 'y_sort' parameter to sort chunks using their y-axis
-    // position during rendering.
-    // However, it applies to whole chunks, not individual tile, so we have to force the chunk
-    // size to be exactly one tile
-    TilemapRenderSettings {
-      render_chunk_size: UVec2::new(16, 1),
-      y_sort: true,
-    },
-  ));
-
   // ground for 3D
   commands.spawn((
     Ground,
@@ -97,6 +57,25 @@ fn setup_world(
     },
     Name::from("Directional Light"),
   ));
+
+  // A Simple Cube in 3D
+  commands
+    .spawn((
+      PbrBundle {
+        mesh: meshes.add(Cuboid::new(1.0, 1.0, 1.0)),
+        material: materials.add(StandardMaterial {
+          base_color: Color::from(css::DARK_RED),
+          metallic: 0.5,
+          reflectance: 0.7,
+          ..default()
+        }),
+        transform: Transform::from_xyz(1.5, 0.5, 1.5),
+        ..default()
+      },
+      Name::from("Cube"),
+    ))
+    .insert(RigidBody::Dynamic)
+    .insert(Collider::cuboid(1.0, 1.0, 1.0));
 
   next_state.set(GameState::LoadingPlayer)
 }
