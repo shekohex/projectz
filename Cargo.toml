@@ -34,7 +34,7 @@ thiserror = { version = "^1" }
 
 # Disable default features for Bevy to reduce compile times.
 [dependencies.bevy]
-version = "0.14"
+version = "0.15"
 default-features = false
 features = [
   # Enable AccessKit on Windows backend.
