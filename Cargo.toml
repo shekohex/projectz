@@ -9,7 +9,7 @@ publish = false
 # A Utility for loading assets in Bevy, with support for 3D assets.
 bevy_asset_loader = { version = "0.21", features = ["3d"] }
 # Motion Controller
-bevy-tnua = { version = "0.20.0", default-features = false }
+bevy-tnua = { version = "0.21.0", default-features = false }
 # Avian3D Integration layer with Bevy Tnua for 3D physics
 bevy-tnua-avian3d = { version = "0.1.1", default-features = false }
 
