@@ -4,6 +4,7 @@
 
 pub use crate::dev_tools::DevPlugins;
 pub use crate::physics::GamePhysicsPlugins;
+pub use crate::sprite_3d::{Sprite3D, Sprite3DPlugin};
 pub use crate::window::CustomizedWindowPlugin;
 
 pub use self::assets::*;
@@ -34,5 +35,5 @@ mod states {
 
 /// Environment prelude.
 mod environment {
-  pub use crate::environment::EnvironmentPlugin;
+  pub use crate::environment::{EnvironmentAssets, EnvironmentPlugin};
 }

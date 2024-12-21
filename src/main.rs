@@ -10,9 +10,10 @@ fn main() {
         .set(ImagePlugin::default_nearest())
         .add(CustomizedWindowPlugin),
     )
-    .add_plugins(GamePhysicsPlugins)
     .init_state::<GameState>()
     .add_plugins(AssetsPlugin)
+    .add_plugins(GamePhysicsPlugins)
+    .add_plugins(Sprite3DPlugin)
     .add_plugins(DevPlugins)
     .add_plugins(GameCameraPlugin)
     .add_plugins(EnvironmentPlugin)

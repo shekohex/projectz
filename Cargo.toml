@@ -7,14 +7,14 @@ publish = false
 
 [dependencies]
 # A Utility for loading assets in Bevy, with support for 3D assets.
-bevy_asset_loader = { version = "0.21", features = ["3d"] }
+bevy_asset_loader = { version = "0.22", features = ["3d", "progress_tracking"] }
+iyes_progress = { version = "0.13", default-features = false, features = ["assets"] }
 # Motion Controller
-bevy-tnua = { version = "0.20.0", default-features = false }
+bevy-tnua = { version = "0.21.0", default-features = false }
 # Avian3D Integration layer with Bevy Tnua for 3D physics
-bevy-tnua-avian3d = { version = "0.1.1", default-features = false }
+bevy-tnua-avian3d = { version = "0.2", default-features = false }
 
-# Development utilities
-bevy_editor_pls = { version = "0.10", optional = true }
+bevy-inspector-egui = { version = "0.28.0", optional = true }
 
 # Winit and Image are used here mainly to set up the window icon.
 # See: https://bevy-cheatbook.github.io/window/icon.html#setting-the-window-icon
@@ -25,16 +25,17 @@ image = { version = "0.25", default-features = false, features = ["png"] }
 # To improve your runtime performance, added that
 # It'll turn off detailed log levels on compile time so that they don't need
 # to be filtered out while your app is running.
-log = { version = "*", features = ["max_level_debug"] }
-tracing = { version = "*", features = ["max_level_debug"] }
+# log = { version = "*", features = ["max_level_debug"] }
+tracing = { version = "*" }
 serde = { version = "1.0", features = ["derive"] }
 # Utility crates
 strum = { version = "0.26", features = ["derive"] }
 thiserror = { version = "^1" }
+time = { version = "0.3", default-features = false, features = ["std"] }
 
 # Disable default features for Bevy to reduce compile times.
 [dependencies.bevy]
-version = "0.14"
+version = "0.15"
 default-features = false
 features = [
   # Enable AccessKit on Windows backend.
@@ -88,12 +89,13 @@ features = [
   "bevy_ui",
   # winit window and input backend
   "bevy_winit",
+  # Provides window capability
+  "bevy_window",
   # Include a default font containing only ASCII characters at the cost of a 20kB binary size increase.
   "default_font", # TODO: Remove this if we goig to use custom font
 
   # DDS compressed texture support
-  # "dds",
-
+  "dds",
   # HDR image format support
   # "hdr",
 
@@ -149,13 +151,13 @@ features = [
 
 # Pysicis engine
 [dependencies.avian3d]
-version = "0.1"
+version = "0.2"
 default-features = false
 features = ["3d", "bevy_scene", "f32", "parry-f32", "parallel"]
 
 # Input manager
 [dependencies.leafwing-input-manager]
-version = "0.15"
+version = "0.16"
 default-features = false
 features = ["asset", "ui", "mouse", "keyboard", "gamepad"]
 
@@ -174,7 +176,8 @@ dev = [
   "bevy/asset_processor",
   "bevy/bevy_dev_tools",
   "avian3d/debug-plugin",
-  "bevy_editor_pls",
+  "bevy-inspector-egui",
+  "iyes_progress/debug",
 ]
 ci = ["bevy/bevy_ci_testing"]
 

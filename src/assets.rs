@@ -3,6 +3,7 @@
 use crate::prelude::*;
 use bevy::prelude::*;
 use bevy_asset_loader::prelude::*;
+use iyes_progress::prelude::*;
 
 /// Asset Loading and Management Plugin
 #[derive(Default, Debug, Copy, Clone)]
@@ -11,10 +12,19 @@ pub struct AssetsPlugin;
 impl Plugin for AssetsPlugin {
   fn build(&self, app: &mut App) {
     app
-      .add_sub_state::<AssetLoadingState>()
+      .add_plugins(
+        ProgressPlugin::<GameState>::new()
+          .with_state_transition(GameState::LoadingAssets, GameState::LoadingEnvironmentMaps)
+          .with_state_transition(
+            GameState::LoadingEnvironmentMaps,
+            GameState::LoadingPlayerAssets,
+          )
+          .with_state_transition(GameState::LoadingPlayerAssets, GameState::AllAssetsLoaded),
+      )
       .add_loading_state(
         LoadingState::new(GameState::LoadingAssets)
           .continue_to_state(GameState::LoadingEnvironmentMaps)
+          .load_collection::<EnvironmentAssets>()
           .continue_to_state(GameState::LoadingPlayerAssets)
           .load_collection::<PlayerAssets>()
           .continue_to_state(GameState::AllAssetsLoaded),

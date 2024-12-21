@@ -7,7 +7,6 @@ use bevy_asset_loader::prelude::*;
 use bevy_tnua::prelude::*;
 use bevy_tnua::TnuaAnimatingState;
 use bevy_tnua_avian3d::TnuaAvian3dSensorShape;
-use leafwing_input_manager::prelude::*;
 
 /// All Player related animations
 mod animations;
@@ -45,58 +44,14 @@ pub struct Player;
 
 #[derive(AssetCollection, Resource)]
 pub struct PlayerAssets {
-  /// X-Bot Skeleton with animations
-  #[asset(path = "meshes/man.gltf")]
+  #[asset(path = "meshes/man.glb")]
   pub skeleton: Handle<Gltf>,
-}
-
-#[derive(Bundle)]
-struct Player3DBundle {
-  name: Name,
-  /// Player Skeleton
-  skeleton: Handle<Gltf>,
-  /// Player 3D Scene Bundle
-  scene: SceneBundle,
-  /// Player Tag
-  player: Player,
-  /// Rigid Body
-  rigid_body: RigidBody,
-  /// Collider
-  collider: Collider,
-  /// Input Mapper Bundle
-  input_manager: InputManagerBundle<input::PlayerAction>,
-  /// Motion Controller Bundle
-  controller: TnuaControllerBundle,
-  /// Animation State
-  animation_state: TnuaAnimatingState<animations::PlayerAnimationState>,
-  /// Motion Sensor Shape
-  sensor_shape: TnuaAvian3dSensorShape,
-  /// Locked Axis
-  locked_axes: LockedAxes,
 }
 
 /// A run condition that's always false
 #[allow(unused)]
 const fn never() -> bool {
   false
-}
-
-impl Default for Player3DBundle {
-  fn default() -> Self {
-    Self {
-      name: Name::new("Player 3D"),
-      player: Player,
-      scene: Default::default(),
-      skeleton: Default::default(),
-      rigid_body: RigidBody::Dynamic,
-      collider: Collider::capsule(0.5, 2.0),
-      sensor_shape: TnuaAvian3dSensorShape(Collider::cylinder(0.49, 0.0)),
-      input_manager: InputManagerBundle::with_map(input::default_map()),
-      controller: TnuaControllerBundle::default(),
-      animation_state: TnuaAnimatingState::default(),
-      locked_axes: LockedAxes::ROTATION_LOCKED.unlock_rotation_y(),
-    }
-  }
 }
 
 #[tracing::instrument(skip_all)]
@@ -110,15 +65,18 @@ fn spawn_player(
     return;
   };
 
-  commands.spawn(Player3DBundle {
-    scene: SceneBundle {
-      scene: gltf.named_scenes.get("Library").expect("No scene named `Library`").clone(),
-      transform: Transform::from_xyz(0.0, 1.5, 0.0),
-      ..default()
-    },
-    skeleton: player_assets.skeleton.clone(),
-    ..default()
-  });
+  commands.spawn((
+    SceneRoot(gltf.named_scenes.get("Library").expect("No scene named `Library`").clone()),
+    Name::from("Player 3D"),
+    Player,
+    Transform::from_xyz(0.0, 1.5, 0.0),
+    RigidBody::Dynamic,
+    Collider::capsule(0.5, 2.0),
+    TnuaAvian3dSensorShape(Collider::cylinder(0.49, 0.0)),
+    TnuaController::default(),
+    TnuaAnimatingState::<animations::PlayerAnimationState>::default(),
+    LockedAxes::ROTATION_LOCKED.unlock_rotation_y(),
+  ));
 
   // Player is loaded, now can set the game state to InGame
   state.set(GameState::InGame);

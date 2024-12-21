@@ -43,9 +43,10 @@ impl PluginGroup for DevPlugins {
         .add(log_transitions_plugin)
         .add(exit_on_esc_plugin)
         .add(screenshot_plugin)
+        .add(progress_tracking_debug_plugin)
         .add(bevy::diagnostic::FrameTimeDiagnosticsPlugin)
         .add(bevy::dev_tools::fps_overlay::FpsOverlayPlugin::default())
-        .add(bevy_editor_pls::EditorPlugin::default())
+        .add(bevy_inspector_egui::quick::WorldInspectorPlugin::new())
     }
     #[cfg(not(feature = "dev"))]
     {
@@ -54,30 +55,33 @@ impl PluginGroup for DevPlugins {
   }
 }
 
+/// A plugin that logs progress values to the console
+#[cfg(feature = "dev")]
+fn progress_tracking_debug_plugin(app: &mut bevy::app::App) {
+  use iyes_progress::prelude::*;
+  app.init_resource::<ProgressDebug>();
+}
+
 /// A plugin that Takes a screenshot when the F11 key is pressed
 #[cfg(feature = "dev")]
 fn screenshot_plugin(app: &mut bevy::app::App) {
   use bevy::prelude::*;
-  use bevy::render::view::screenshot::ScreenshotManager;
-  use bevy::window::PrimaryWindow;
+  use bevy::render::view::screenshot::{save_to_disk, Screenshot};
 
   app.add_systems(
     Update,
-    |time: Res<Time>,
-     input: Res<ButtonInput<KeyCode>>,
-     main_window: Query<Entity, With<PrimaryWindow>>,
-     mut screenshot_manager: ResMut<ScreenshotManager>,
-     mut counter: Local<u32>| {
+    |input: Res<ButtonInput<KeyCode>>, mut commands: Commands| {
       if input.just_pressed(KeyCode::F11) {
         let path = std::env::current_dir().unwrap().join("screenshots");
         std::fs::create_dir_all(&path).unwrap();
-        let path = path.join(format!(
-          "screenshot_{}_{}.png",
-          time.elapsed_seconds() as u32,
-          *counter
-        ));
-        *counter += 1;
-        screenshot_manager.save_screenshot_to_disk(main_window.single(), path).unwrap();
+        let now = time::OffsetDateTime::now_utc()
+          .to_string()
+          .replace(":", "_")
+          .replace("+", "_")
+          .replace(" ", "_")
+          .replace("-", "_");
+        let path = path.join(format!("screenshot_{now}.png"));
+        commands.spawn(Screenshot::primary_window()).observe(save_to_disk(path));
       }
     },
   );

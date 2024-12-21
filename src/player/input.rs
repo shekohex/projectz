@@ -15,6 +15,7 @@ impl Plugin for PlayerInputPlugin {
   fn build(&self, app: &mut App) {
     app
       .register_type::<PlayerAction>()
+      .add_observer(on_add_player_setup_input)
       .add_plugins(InputManagerPlugin::<PlayerAction>::default())
       .add_plugins(TnuaControllerPlugin::default())
       .add_systems(
@@ -45,7 +46,7 @@ impl PlayerAction {
   ];
 
   /// The speed of the player when walking
-  pub const WALK_SPEED: f32 = 4.0;
+  pub const WALK_SPEED: f32 = 8.0;
   /// The speed of the player when running
   pub const RUN_SPEED: f32 = Self::WALK_SPEED * 1.5;
 
@@ -75,11 +76,9 @@ pub fn default_map() -> InputMap<PlayerAction> {
   let mut input_map = InputMap::default();
 
   input_map.insert(Up, KeyCode::KeyW);
-  input_map.insert(Up, GamepadButtonType::DPadUp);
   input_map.insert(Up, GamepadControlDirection::LEFT_UP);
 
   input_map.insert(Down, KeyCode::KeyS);
-  input_map.insert(Down, GamepadButtonType::DPadDown);
   input_map.insert(Down, GamepadControlDirection::LEFT_DOWN);
 
   input_map.insert(Left, KeyCode::KeyA);
@@ -91,9 +90,15 @@ pub fn default_map() -> InputMap<PlayerAction> {
   input_map.insert(Jump, KeyCode::Space);
 
   input_map.insert(Run, KeyCode::ShiftLeft);
-  input_map.insert(Run, GamepadButtonType::South);
 
   input_map
+}
+
+/// System to add the input manager to the player entity when it's added
+fn on_add_player_setup_input(trigger: Trigger<OnAdd, Player>, mut commands: Commands) {
+  commands
+    .entity(trigger.entity())
+    .insert(InputManagerBundle::with_map(default_map()));
 }
 
 // ====== Systems ======

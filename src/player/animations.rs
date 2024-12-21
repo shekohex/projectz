@@ -94,24 +94,25 @@ pub enum PlayerAnimationState {
 #[tracing::instrument(skip_all)]
 fn setup_player_animations(
   mut commands: Commands,
-  player_query: Query<(Entity, &Handle<Gltf>), Added<Player>>,
+  player_query: Query<Entity, Added<Player>>,
   animation_players: Query<&mut AnimationPlayer>,
   children_query: Query<&Children>,
   mut animation_graphs_assets: ResMut<Assets<AnimationGraph>>,
   gltf_assets: Res<Assets<Gltf>>,
+  player_assets: Res<PlayerAssets>,
 ) {
-  for (entity, gltf_handle) in player_query.iter() {
+  let Some(gltf) = gltf_assets.get(&player_assets.skeleton) else {
+    return;
+  };
+
+  for entity in player_query.iter() {
     // Find the first child with an animation player, this our player mesh
     let player_mesh = children_query
       .iter_descendants(entity)
       .find(|child| animation_players.get(*child).is_ok());
 
     let Some(player_mesh) = player_mesh else {
-      continue;
-    };
-
-    let Some(gltf) = gltf_assets.get(gltf_handle) else {
-      continue;
+      return;
     };
 
     let mut graph = AnimationGraph::new();
@@ -138,10 +139,10 @@ fn setup_player_animations(
     // Add all animations as a resource
     commands.insert_resource(animations);
 
-    // Insert the animations graph into the player mesh entity
+    // Insert the animation graph into the player mesh entity
     commands
       .entity(player_mesh)
-      .insert(animation_graphs_assets.add(graph))
+      .insert(AnimationGraphHandle(animation_graphs_assets.add(graph)))
       .insert(AnimationTransitions::new());
   }
 }
@@ -286,8 +287,7 @@ fn update_player_animations(
                 animations.walking,
                 Duration::from_millis(200),
               )
-              .set_speed(1.0)
-              .repeat();
+              .set_speed(1.0);
           },
         }
       },

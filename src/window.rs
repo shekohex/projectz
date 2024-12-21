@@ -53,8 +53,8 @@ fn set_window_icon(
   // this isn't a very bevy-native solution, but it'll do
   let (icon_rgba, icon_width, icon_height) = {
     let assets_path = std::path::PathBuf::from(env!("ASSETS_DIR"));
-    let icon_path = assets_path.join("..").join("art").join("projectz_icon.png");
-    eprintln!("Loading icon from path: {}", icon_path.display());
+    let icon_path = assets_path.parent().unwrap().join("art").join("projectz_icon.png");
+    trace!("Loading icon from path: {}", icon_path.display());
     let image = image::open(icon_path).expect("Failed to open icon path").into_rgba8();
     let (width, height) = image.dimensions();
     let rgba = image.into_raw();

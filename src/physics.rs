@@ -12,7 +12,7 @@ impl PluginGroup for GamePhysicsPlugins {
     group = group.add_group(avian3d::PhysicsPlugins::default());
     group = group.add(gravity_3d_plugin);
     // Tnua Integration with Our Physics Engine
-    group = group.add(TnuaAvian3dPlugin::default());
+    group = group.add(TnuaAvian3dPlugin::new(FixedUpdate));
     #[cfg(feature = "dev")]
     {
       group = group.add(avian3d::debug_render::PhysicsDebugPlugin::default());

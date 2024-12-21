@@ -1,4 +1,4 @@
-//! Project Z: A Prototype of an MMORPG in Rust using Bevy Engine.
+//! Project Z: a Prototype of an MMORPG in Rust using Bevy Engine.
 
 use bevy::prelude::*;
 
@@ -14,8 +14,10 @@ pub mod environment;
 pub mod physics;
 /// Player plugin and systems
 pub mod player;
-/// Our game prelude
+/// Game prelude
 pub mod prelude;
+/// Sprite 3D Plugin and Systems
+pub mod sprite_3d;
 /// Window plugin customizations
 pub mod window;
 
@@ -34,6 +36,6 @@ pub enum GameState {
   LoadingWorld,
   /// Currently loading the Player
   LoadingPlayer,
-  /// We are in the game, everything is loaded
+  /// Currently in the game, everything is loaded
   InGame,
 }

@@ -25,13 +25,14 @@ fn setup_camera_3d(mut commands: Commands) {
   // TODO: figure out the correct rotation for the camera
   // for now, this just works.
   transform.rotate_x(-0.5);
-  let projection = OrthographicProjection {
-    // 48 world units
-    scaling_mode: ScalingMode::WindowSize(48.0),
+  let projection = Projection::from(OrthographicProjection {
+    scaling_mode: ScalingMode::FixedVertical {
+      viewport_height: 32.0,
+    },
     near: -100.0,
     far: 1000.0,
-    ..default()
-  };
+    ..OrthographicProjection::default_3d()
+  });
 
   let is_active = true;
   let hdr = true;
@@ -39,17 +40,15 @@ fn setup_camera_3d(mut commands: Commands) {
   let clear_color = ClearColorConfig::Custom(Color::srgba(0.0, 0.0, 0.0, 0.0));
   // Player Camera
   commands.spawn((
-    Camera3dBundle {
-      camera: Camera {
-        is_active,
-        hdr,
-        clear_color,
-        ..default()
-      },
-      projection: projection.into(),
-      transform,
+    Camera3d::default(),
+    Camera {
+      is_active,
+      hdr,
+      clear_color,
       ..default()
     },
+    projection,
+    transform,
     Name::from("Camera3D"),
     Primary3DCamera,
   ));
