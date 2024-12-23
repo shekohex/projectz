@@ -30,7 +30,7 @@ tracing = { version = "*" }
 serde = { version = "1.0", features = ["derive"] }
 # Utility crates
 strum = { version = "0.26", features = ["derive"] }
-thiserror = { version = "^1" }
+thiserror = { version = "^2" }
 time = { version = "0.3", default-features = false, features = ["std"] }
 
 # Disable default features for Bevy to reduce compile times.
