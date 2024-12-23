@@ -18,7 +18,7 @@ bevy-inspector-egui = { version = "0.28.0", optional = true }
 
 # Winit and Image are used here mainly to set up the window icon.
 # See: https://bevy-cheatbook.github.io/window/icon.html#setting-the-window-icon
-winit = "0.30.5"
+winit = "0.30.7"
 image = { version = "0.25", default-features = false, features = ["png"] }
 
 # Bevy's dependencies do a lot of trace logging that isn't relevant for an end user.
