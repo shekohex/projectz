@@ -17,7 +17,7 @@ impl Plugin for PlayerInputPlugin {
       .register_type::<PlayerAction>()
       .add_observer(on_add_player_setup_input)
       .add_plugins(InputManagerPlugin::<PlayerAction>::default())
-      .add_plugins(TnuaControllerPlugin::default())
+      .add_plugins(TnuaControllerPlugin::new(FixedUpdate))
       .add_systems(
         Update,
         (player_3d_movement, player_jump).in_set(TnuaUserControlsSystemSet),
@@ -127,7 +127,7 @@ fn player_3d_movement(
 
     // If pressed multiple keys, normalize the direction so don't move faster diagonally
     if direction.length() > 0.0 {
-      direction = direction.normalize();
+      direction = direction.normalize_or_zero();
     }
 
     // Feed the basis every frame. Even if the player doesn't move - just use `desired_velocity:

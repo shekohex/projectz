@@ -10,13 +10,18 @@ use bevy_asset_loader::prelude::*;
 
 use crate::prelude::*;
 
+/// Map Loader Plugin to organize map loading related systems
+mod map_loader;
+
 /// Game Environment Plugin to organize environment related systems
 #[derive(Default, Debug, Copy, Clone)]
 pub struct EnvironmentPlugin;
 
 impl Plugin for EnvironmentPlugin {
   fn build(&self, app: &mut App) {
-    app.add_systems(OnEnter(GameState::LoadingWorld), setup_world);
+    app
+      .add_plugins(map_loader::MapLoaderPlugin)
+      .add_systems(OnEnter(GameState::LoadingWorld), setup_world);
   }
 }
 

@@ -287,7 +287,8 @@ fn update_player_animations(
                 animations.walking,
                 Duration::from_millis(200),
               )
-              .set_speed(1.0);
+              .set_speed(1.0)
+              .repeat();
           },
         }
       },

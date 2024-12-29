@@ -8,7 +8,8 @@ publish = false
 [dependencies]
 # A Utility for loading assets in Bevy, with support for 3D assets.
 bevy_asset_loader = { version = "0.22", features = ["3d", "progress_tracking"] }
-iyes_progress = { version = "0.13", default-features = false, features = ["assets"] }
+bevy_common_assets = { version = "0.12.0", features = ["ron"] }
+iyes_progress = { version = "0.13", features = ["assets"] }
 # Motion Controller
 bevy-tnua = { version = "0.21.0", default-features = false }
 # Avian3D Integration layer with Bevy Tnua for 3D physics
@@ -170,7 +171,6 @@ embed-resource = "3.0"
 
 [features]
 dev = [
-  "bevy/dynamic_linking",
   "bevy/file_watcher",
   "bevy/embedded_watcher",
   "bevy/asset_processor",
@@ -179,6 +179,7 @@ dev = [
   "bevy-inspector-egui",
   "iyes_progress/debug",
 ]
+dynamic_linking = ["bevy/dynamic_linking"]
 ci = ["bevy/bevy_ci_testing"]
 
 # Enable a small amount of optimization in the dev profile.

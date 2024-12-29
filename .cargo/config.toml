@@ -144,6 +144,26 @@ rustflags = [
 # [profile.dev]
 # debug = 1
 
+# This uses a new nightly-only codegen that is about 30% faster at compiling than LLVM. It currently works best on Linux.
+#
+# To install cranelift, run the following.
+#
+# ```
+# rustup component add rustc-codegen-cranelift-preview --toolchain nightly
+# ```
+[unstable]
+codegen-backend = true
+
+# While cranelift is very fast to compile, the generated binaries are not optimized for speed. Additionally, it is generally still immature, so you may run into issues with it. Notably, Wasm builds do not work yet.
+#
+# When shipping your game, you should still compile it with LLVM.
+[profile.dev]
+codegen-backend = "cranelift"
+
+# This enables faster compiles for your binary, but builds Bevy and other dependencies with the more-optimized LLVM backend.
+[profile.dev.package."*"]
+codegen-backend = "llvm"
+
 # This is enables you to run the CI tool using `cargo ci`.
 # This is not enabled by default, you need to copy this file to `config.toml`.
 [alias]

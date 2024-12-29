@@ -1,0 +1,365 @@
+(
+    version: V1,
+    id: 1005,
+    width: 96,
+    height: 96,
+    puzzles: [
+        (
+            version: V1,
+            width: 10,
+            height: 7,
+            parts: [
+                (
+                    x: 0,
+                    y: 0,
+                    texture_path: "textures/room/arena/arena000.dds",
+                ),
+                (
+                    x: 1,
+                    y: 0,
+                    texture_path: "textures/room/arena/arena000.dds",
+                ),
+                (
+                    x: 2,
+                    y: 0,
+                    texture_path: "textures/room/arena/arena000.dds",
+                ),
+                (
+                    x: 3,
+                    y: 0,
+                    texture_path: "textures/room/arena/arena003.dds",
+                ),
+                (
+                    x: 4,
+                    y: 0,
+                    texture_path: "textures/room/arena/arena004.dds",
+                ),
+                (
+                    x: 5,
+                    y: 0,
+                    texture_path: "textures/room/arena/arena005.dds",
+                ),
+                (
+                    x: 6,
+                    y: 0,
+                    texture_path: "textures/room/arena/arena006.dds",
+                ),
+                (
+                    x: 7,
+                    y: 0,
+                    texture_path: "textures/room/arena/arena000.dds",
+                ),
+                (
+                    x: 8,
+                    y: 0,
+                    texture_path: "textures/room/arena/arena000.dds",
+                ),
+                (
+                    x: 9,
+                    y: 0,
+                    texture_path: "textures/room/arena/arena000.dds",
+                ),
+                (
+                    x: 0,
+                    y: 1,
+                    texture_path: "textures/room/arena/arena000.dds",
+                ),
+                (
+                    x: 1,
+                    y: 1,
+                    texture_path: "textures/room/arena/arena011.dds",
+                ),
+                (
+                    x: 2,
+                    y: 1,
+                    texture_path: "textures/room/arena/arena012.dds",
+                ),
+                (
+                    x: 3,
+                    y: 1,
+                    texture_path: "textures/room/arena/arena013.dds",
+                ),
+                (
+                    x: 4,
+                    y: 1,
+                    texture_path: "textures/room/arena/arena014.dds",
+                ),
+                (
+                    x: 5,
+                    y: 1,
+                    texture_path: "textures/room/arena/arena015.dds",
+                ),
+                (
+                    x: 6,
+                    y: 1,
+                    texture_path: "textures/room/arena/arena016.dds",
+                ),
+                (
+                    x: 7,
+                    y: 1,
+                    texture_path: "textures/room/arena/arena017.dds",
+                ),
+                (
+                    x: 8,
+                    y: 1,
+                    texture_path: "textures/room/arena/arena018.dds",
+                ),
+                (
+                    x: 9,
+                    y: 1,
+                    texture_path: "textures/room/arena/arena019.dds",
+                ),
+                (
+                    x: 0,
+                    y: 2,
+                    texture_path: "textures/room/arena/arena020.dds",
+                ),
+                (
+                    x: 1,
+                    y: 2,
+                    texture_path: "textures/room/arena/arena021.dds",
+                ),
+                (
+                    x: 2,
+                    y: 2,
+                    texture_path: "textures/room/arena/arena022.dds",
+                ),
+                (
+                    x: 3,
+                    y: 2,
+                    texture_path: "textures/room/arena/arena023.dds",
+                ),
+                (
+                    x: 4,
+                    y: 2,
+                    texture_path: "textures/room/arena/arena024.dds",
+                ),
+                (
+                    x: 5,
+                    y: 2,
+                    texture_path: "textures/room/arena/arena025.dds",
+                ),
+                (
+                    x: 6,
+                    y: 2,
+                    texture_path: "textures/room/arena/arena026.dds",
+                ),
+                (
+                    x: 7,
+                    y: 2,
+                    texture_path: "textures/room/arena/arena027.dds",
+                ),
+                (
+                    x: 8,
+                    y: 2,
+                    texture_path: "textures/room/arena/arena028.dds",
+                ),
+                (
+                    x: 9,
+                    y: 2,
+                    texture_path: "textures/room/arena/arena029.dds",
+                ),
+                (
+                    x: 0,
+                    y: 3,
+                    texture_path: "textures/room/arena/arena030.dds",
+                ),
+                (
+                    x: 1,
+                    y: 3,
+                    texture_path: "textures/room/arena/arena031.dds",
+                ),
+                (
+                    x: 2,
+                    y: 3,
+                    texture_path: "textures/room/arena/arena032.dds",
+                ),
+                (
+                    x: 3,
+                    y: 3,
+                    texture_path: "textures/room/arena/arena033.dds",
+                ),
+                (
+                    x: 4,
+                    y: 3,
+                    texture_path: "textures/room/arena/arena034.dds",
+                ),
+                (
+                    x: 5,
+                    y: 3,
+                    texture_path: "textures/room/arena/arena035.dds",
+                ),
+                (
+                    x: 6,
+                    y: 3,
+                    texture_path: "textures/room/arena/arena036.dds",
+                ),
+                (
+                    x: 7,
+                    y: 3,
+                    texture_path: "textures/room/arena/arena037.dds",
+                ),
+                (
+                    x: 8,
+                    y: 3,
+                    texture_path: "textures/room/arena/arena038.dds",
+                ),
+                (
+                    x: 9,
+                    y: 3,
+                    texture_path: "textures/room/arena/arena039.dds",
+                ),
+                (
+                    x: 0,
+                    y: 4,
+                    texture_path: "textures/room/arena/arena040.dds",
+                ),
+                (
+                    x: 1,
+                    y: 4,
+                    texture_path: "textures/room/arena/arena041.dds",
+                ),
+                (
+                    x: 2,
+                    y: 4,
+                    texture_path: "textures/room/arena/arena042.dds",
+                ),
+                (
+                    x: 3,
+                    y: 4,
+                    texture_path: "textures/room/arena/arena043.dds",
+                ),
+                (
+                    x: 4,
+                    y: 4,
+                    texture_path: "textures/room/arena/arena044.dds",
+                ),
+                (
+                    x: 5,
+                    y: 4,
+                    texture_path: "textures/room/arena/arena045.dds",
+                ),
+                (
+                    x: 6,
+                    y: 4,
+                    texture_path: "textures/room/arena/arena046.dds",
+                ),
+                (
+                    x: 7,
+                    y: 4,
+                    texture_path: "textures/room/arena/arena047.dds",
+                ),
+                (
+                    x: 8,
+                    y: 4,
+                    texture_path: "textures/room/arena/arena048.dds",
+                ),
+                (
+                    x: 9,
+                    y: 4,
+                    texture_path: "textures/room/arena/arena049.dds",
+                ),
+                (
+                    x: 0,
+                    y: 5,
+                    texture_path: "textures/room/arena/arena000.dds",
+                ),
+                (
+                    x: 1,
+                    y: 5,
+                    texture_path: "textures/room/arena/arena051.dds",
+                ),
+                (
+                    x: 2,
+                    y: 5,
+                    texture_path: "textures/room/arena/arena052.dds",
+                ),
+                (
+                    x: 3,
+                    y: 5,
+                    texture_path: "textures/room/arena/arena053.dds",
+                ),
+                (
+                    x: 4,
+                    y: 5,
+                    texture_path: "textures/room/arena/arena054.dds",
+                ),
+                (
+                    x: 5,
+                    y: 5,
+                    texture_path: "textures/room/arena/arena055.dds",
+                ),
+                (
+                    x: 6,
+                    y: 5,
+                    texture_path: "textures/room/arena/arena056.dds",
+                ),
+                (
+                    x: 7,
+                    y: 5,
+                    texture_path: "textures/room/arena/arena057.dds",
+                ),
+                (
+                    x: 8,
+                    y: 5,
+                    texture_path: "textures/room/arena/arena000.dds",
+                ),
+                (
+                    x: 9,
+                    y: 5,
+                    texture_path: "textures/room/arena/arena000.dds",
+                ),
+                (
+                    x: 0,
+                    y: 6,
+                    texture_path: "textures/room/arena/arena000.dds",
+                ),
+                (
+                    x: 1,
+                    y: 6,
+                    texture_path: "textures/room/arena/arena000.dds",
+                ),
+                (
+                    x: 2,
+                    y: 6,
+                    texture_path: "textures/room/arena/arena000.dds",
+                ),
+                (
+                    x: 3,
+                    y: 6,
+                    texture_path: "textures/room/arena/arena000.dds",
+                ),
+                (
+                    x: 4,
+                    y: 6,
+                    texture_path: "textures/room/arena/arena064.dds",
+                ),
+                (
+                    x: 5,
+                    y: 6,
+                    texture_path: "textures/room/arena/arena065.dds",
+                ),
+                (
+                    x: 6,
+                    y: 6,
+                    texture_path: "textures/room/arena/arena000.dds",
+                ),
+                (
+                    x: 7,
+                    y: 6,
+                    texture_path: "textures/room/arena/arena000.dds",
+                ),
+                (
+                    x: 8,
+                    y: 6,
+                    texture_path: "textures/room/arena/arena000.dds",
+                ),
+                (
+                    x: 9,
+                    y: 6,
+                    texture_path: "textures/room/arena/arena000.dds",
+                ),
+            ],
+        ),
+    ],
+)
