@@ -16,8 +16,8 @@ impl Plugin for CustomizedWindowPlugin {
           title: craft_window_title(),
           name: Some("shekohex.project_z".into()),
           // TODO: Set the resolution to an appropriate value
-          resolution: (800., 1048.).into(),
-          position: WindowPosition::At(IVec2::new(1111, 0)),
+          resolution: (1024.0, 768.0).into(),
+          position: WindowPosition::At(IVec2::new(888, 0)),
           present_mode: PresentMode::AutoVsync,
           focused: true,
           window_level: WindowLevel::Normal,

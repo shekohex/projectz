@@ -18,7 +18,7 @@ game $WGPU_BACKEND="dx12" $RUST_LOG="info,wgpu=error,naga=warn,project_z=debug":
 [group('run')]
 [private]
 [windows]
-play $WGPU_BACKEND="dx12" $RUST_LOG="info,wgpu=error,naga=warn,project_z=debug":
+play $WGPU_BACKEND="dx12" $RUST_LOG="info,wgpu=error,naga=warn,project_z=trace":
     cargo run -F dev
 
 [group('run')]

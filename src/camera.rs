@@ -1,3 +1,4 @@
+use bevy::core_pipeline::tonemapping::Tonemapping;
 use bevy::prelude::*;
 use bevy::render::camera::ScalingMode;
 
@@ -22,20 +23,16 @@ pub struct Primary3DCamera;
 /// The system that sets up the 3D camera
 fn setup_camera_3d(mut commands: Commands) {
   let mut transform = CAMERA_DEFAULT_TRANSFORM;
-  // TODO: figure out the correct rotation for the camera
-  // for now, this just works.
-  transform.rotate_x(-0.5);
+  transform.rotate_x(-1.785);
   let projection = Projection::from(OrthographicProjection {
-    scaling_mode: ScalingMode::FixedVertical {
-      viewport_height: 32.0,
-    },
-    near: -100.0,
+    scaling_mode: ScalingMode::WindowSize,
+    near: -1000.0,
     far: 1000.0,
     ..OrthographicProjection::default_3d()
   });
 
   let is_active = true;
-  let hdr = true;
+  let hdr = false;
   // For transparency
   let clear_color = ClearColorConfig::Custom(Color::srgba(0.0, 0.0, 0.0, 0.0));
   // Player Camera
@@ -50,6 +47,8 @@ fn setup_camera_3d(mut commands: Commands) {
     projection,
     transform,
     Name::from("Camera3D"),
+    Msaa::Off,
+    Tonemapping::None,
     Primary3DCamera,
   ));
 }

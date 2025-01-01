@@ -46,7 +46,7 @@ impl PlayerAction {
   ];
 
   /// The speed of the player when walking
-  pub const WALK_SPEED: f32 = 8.0;
+  pub const WALK_SPEED: f32 = 128.0;
   /// The speed of the player when running
   pub const RUN_SPEED: f32 = Self::WALK_SPEED * 1.5;
 
@@ -139,7 +139,7 @@ fn player_3d_movement(
       desired_forward: Dir3::new(direction.neg()).ok(),
       // The `float_height` must be greater even if by little from the distance between the
       // character's center and the lowest point of its collider.
-      float_height: 1.5,
+      float_height: 100.0,
       // `TnuaBuiltinWalk` has many other fields for customizing the movement - but they have
       // sensible defaults. Refer to the `TnuaBuiltinWalk`'s documentation to learn what they do.
       ..default()
@@ -154,7 +154,7 @@ fn player_jump(mut query: Query<(&ActionState<PlayerAction>, &mut TnuaController
       // stops holding the jump button, stop feeding the action.
       controller.action(TnuaBuiltinJump {
         // The height is the only mandatory field of the jump button.
-        height: 7.0,
+        height: 150.0,
         // `TnuaBuiltinJump` also has customization fields with sensible defaults.
         ..default()
       });

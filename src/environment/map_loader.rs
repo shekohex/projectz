@@ -2,100 +2,161 @@
 
 use std::path::PathBuf;
 
-use avian3d::prelude::*;
 use bevy::asset::LoadedFolder;
 use bevy::prelude::*;
+use bevy::state::state::FreelyMutableState;
 use bevy::utils::HashMap;
 use bevy_common_assets::ron::RonAssetPlugin;
 
-use crate::prelude::*;
-
-/// Arena Plugin to organize arena related systems
-#[derive(Debug, Clone, Default)]
-pub struct MapLoaderPlugin;
-
-#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
-pub enum MapVersion {
-  #[default]
-  V1,
+/// Plugin to load game maps and provides a [`GameMaps`] resource.
+#[derive(Debug, Clone, bon::Builder)]
+pub struct GameMapsLoaderPlugin<S> {
+  /// The path to the folder containing the game maps information.
+  #[builder(into, default = "maps")]
+  maps: PathBuf,
+  /// The State when entered we will start loading the game maps.
+  on_enter: S,
+  /// The State to continue to after loading the game maps.
+  continue_to_state: S,
 }
 
-#[derive(Debug, Clone, Default, Asset, TypePath, serde::Serialize, serde::Deserialize)]
+/// Represents a game map with its properties and puzzles.
+#[derive(Debug, Clone, Default, Asset, serde::Serialize, serde::Deserialize, Reflect)]
+#[reflect(Debug)]
 pub struct GameMap {
+  /// The version of the map.
   pub version: MapVersion,
+  /// The unique identifier of the map.
   pub id: u16,
+  /// The width of the map.
   pub width: u16,
+  /// The height of the map.
   pub height: u16,
+  /// The list of puzzles in the map.
   pub puzzles: Vec<Puzzle>,
 }
 
-#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
-pub enum PuzzleVersion {
+/// Enum representing the version of the map.
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, Reflect)]
+#[reflect(Debug)]
+pub enum MapVersion {
+  /// Version 1 of the map.
   #[default]
   V1,
+}
+
+/// Enum representing the version of the puzzle.
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, Reflect)]
+#[reflect(Debug)]
+pub enum PuzzleVersion {
+  /// Version 1 of the puzzle.
+  #[default]
+  V1,
+  /// Version 2 of the puzzle.
   V2,
 }
 
-#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
+/// Represents a puzzle with its properties and parts.
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, Reflect)]
+#[reflect(Debug)]
 pub struct Puzzle {
+  /// The version of the puzzle.
   pub version: PuzzleVersion,
+  /// The width of the puzzle.
   pub width: u16,
+  /// The height of the puzzle.
   pub height: u16,
+  /// The list of parts in the puzzle.
   pub parts: Vec<PuzzlePart>,
 }
 
-#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
+/// Represents a part of a puzzle with its properties.
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, Reflect)]
+#[reflect(Debug)]
 pub struct PuzzlePart {
+  /// The x-coordinate of the puzzle part.
   pub x: u16,
+  /// The y-coordinate of the puzzle part.
   pub y: u16,
+  /// The path to the texture of the puzzle part.
   pub texture_path: PathBuf,
+  /// The handle to the texture of the puzzle part.
   #[serde(skip, default)]
   pub texture: Handle<Image>,
 }
 
-/// A tag component for the ground
-#[derive(Debug, Component, Reflect)]
-#[reflect(Debug)]
-struct Ground;
-
-impl Plugin for MapLoaderPlugin {
+impl<S: FreelyMutableState> Plugin for GameMapsLoaderPlugin<S> {
   fn build(&self, app: &mut App) {
     app
+      .register_type::<GameMap>()
       .init_resource::<GameMaps>()
+      .insert_resource(PendingNextState(self.continue_to_state.clone()))
+      .insert_resource(GameMapsFolderHandle {
+        path: self.maps.clone(),
+        handle: Handle::default(),
+      })
       .add_plugins(RonAssetPlugin::<GameMap>::new(&["map.ron"]))
-      .add_systems(OnEnter(GameState::LoadingEnvironmentMaps), load_game_maps)
+      .add_systems(OnEnter(self.on_enter.clone()), load_game_maps)
       .add_systems(
         Update,
-        setup_game_maps.run_if(in_state(GameState::LoadingEnvironmentMaps)),
+        setup_game_maps.run_if(in_state(self.on_enter.clone())),
       )
-      .add_systems(OnEnter(GameState::InGame), print_game_maps);
+      .add_observer(on_all_maps_are_loaded::<S>)
+      .add_observer(on_game_map_loaded);
   }
 }
 
+/// A Resource that holds the handles loaded game maps.
 #[derive(Clone, Default, Debug, Resource)]
 pub struct GameMaps {
+  /// a map from game map id to the handle of the game map.
   pub handles: HashMap<u16, Handle<GameMap>>,
 }
 
-#[derive(Resource)]
-struct GameMapsHandle(Handle<LoadedFolder>);
+/// An auxiliary resource to hold the handle of the loaded folder.
+#[derive(Debug, Resource, Reflect)]
+#[reflect(Debug)]
+struct GameMapsFolderHandle {
+  path: PathBuf,
+  handle: Handle<LoadedFolder>,
+}
 
-fn load_game_maps(mut commands: Commands, asset_server: Res<AssetServer>) {
-  let maps = asset_server.load_folder("maps");
-  commands.insert_resource(GameMapsHandle(maps));
+#[derive(Debug, Clone, Default, Resource, Reflect)]
+#[reflect(Debug)]
+struct PendingNextState<S: FreelyMutableState>(S);
+
+/// An Event that is dispatched when a game map is loaded.
+#[derive(Debug, Clone, Event)]
+pub struct GameMapLoadedEvent {
+  /// the id of the loaded map.
+  id: u16,
+  /// the handle of the loaded map.
+  handle: Handle<GameMap>,
+}
+
+/// An Event that is dispatched when all the game maps are loaded.
+#[derive(Debug, Clone, Event)]
+pub struct AllGameMapsLoaded;
+
+/// A simple system to load the game maps from the specified folder.
+#[tracing::instrument(skip_all)]
+fn load_game_maps(asset_server: Res<AssetServer>, mut folder: ResMut<GameMapsFolderHandle>) {
+  let maps = asset_server.load_folder(folder.path.as_path());
+  folder.handle = maps;
   debug!("Loading maps");
 }
 
+#[tracing::instrument(skip_all)]
 fn setup_game_maps(
   mut commands: Commands,
   asset_server: Res<AssetServer>,
-  maps_handle: Res<GameMapsHandle>,
-  mut game_maps: ResMut<GameMaps>,
+  folder: Res<GameMapsFolderHandle>,
   mut loaded_maps: ResMut<Assets<GameMap>>,
   mut loaded_folders: ResMut<Assets<LoadedFolder>>,
 ) {
   // Check if the whole folder is loaded
-  let Some(maps_folder) = loaded_folders.get(&maps_handle.0) else {
+  let Some(maps_folder) = loaded_folders.get(&folder.handle) else {
+    trace!(path = %folder.path.display(), "Maps folder not loaded yet");
     return;
   };
 
@@ -128,39 +189,42 @@ fn setup_game_maps(
       .for_each(|part| {
         part.texture = asset_server.load(part.texture_path.clone());
       });
-
-    game_maps.handles.insert(loaded_map.id, typed_handle);
+    // Send event to bookkeep the loaded map
+    let event = GameMapLoadedEvent {
+      id: loaded_map.id,
+      handle: typed_handle,
+    };
+    trace!(?event, "triggered");
+    commands.trigger(event);
   }
 
   if all_maps_loaded {
-    debug!("All maps loaded");
-    loaded_folders.remove(maps_handle.0.id());
-    commands.remove_resource::<GameMapsHandle>();
-  } else {
-    trace!("Not all maps loaded");
+    loaded_folders.remove(folder.handle.id());
+    commands.remove_resource::<GameMapsFolderHandle>();
+    let event = AllGameMapsLoaded;
+    trace!(?event, "triggered");
+    commands.trigger(event);
   }
 }
 
-fn print_game_maps(game_maps: Res<GameMaps>, game_map: Res<Assets<GameMap>>) {
-  for (id, handle) in game_maps.handles.iter() {
-    let Some(game_map) = game_map.get(handle) else {
-      continue;
-    };
-    debug!(id = *id, map = ?game_map, "Game Map");
-  }
+/// A simple system to update the game maps when a new map is loaded.
+#[tracing::instrument(skip_all)]
+fn on_game_map_loaded(trigger: Trigger<GameMapLoadedEvent>, mut game_maps: ResMut<GameMaps>) {
+  trace!(id = %trigger.id, "Map loaded");
+  game_maps.handles.insert(trigger.id, trigger.handle.clone());
 }
 
-/// System to set up the map.
-fn setup_map(mut commands: Commands, mut meshes: ResMut<Assets<Mesh>>) {
-  // ground for 3D
-  commands.spawn((
-    Mesh3d(meshes.add(Plane3d::new(Vec3::Y, Vec2::new(100.0, 100.0)))),
-    Transform::from_xyz(0.0, 0.0, 0.0),
-    Ground,
-    RigidBody::Static,
-    Collider::half_space(Vec3::Y),
-    Name::from("Ground"),
-  ));
+#[tracing::instrument(skip_all)]
+fn on_all_maps_are_loaded<S: FreelyMutableState>(
+  _trigger: Trigger<AllGameMapsLoaded>,
+  mut commands: Commands,
+  next: Res<PendingNextState<S>>,
+  mut next_state: ResMut<NextState<S>>,
+) {
+  trace!("All maps are loaded, moving to the next state");
+  let next = next.0.clone();
+  next_state.set(next);
+  commands.remove_resource::<PendingNextState<S>>();
 }
 
 impl GameMap {
@@ -179,6 +243,8 @@ mod tests {
   use bevy::log::LogPlugin;
   use bevy::state::app::StatesPlugin;
 
+  use crate::GameState;
+
   use super::*;
 
   #[test]
@@ -192,7 +258,13 @@ mod tests {
       ImagePlugin::default_nearest(),
     ));
     app.init_state::<GameState>();
-    app.add_plugins(MapLoaderPlugin);
+    app.add_plugins(
+      GameMapsLoaderPlugin::builder()
+        .maps("maps")
+        .on_enter(GameState::LoadingEnvironmentMaps)
+        .continue_to_state(GameState::LoadingPlayerAssets)
+        .build(),
+    );
     app.update();
 
     let expected = GameState::default();
@@ -211,18 +283,12 @@ mod tests {
     let actual = app.world().get_resource::<State<GameState>>().unwrap();
     assert_eq!(expected, **actual);
 
-    while app.world().get_resource::<GameMapsHandle>().is_some() {
+    while app.world().get_resource::<GameMapsFolderHandle>().is_some() {
       app.update();
       std::thread::sleep(std::time::Duration::from_millis(16));
     }
 
-    // move to in game state
-    app
-      .world_mut()
-      .get_resource_mut::<NextState<GameState>>()
-      .map(|mut next| next.set(GameState::InGame))
-      .unwrap();
-
+    // All maps are loaded
     app.update();
   }
 }

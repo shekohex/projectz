@@ -39,6 +39,8 @@ impl PluginGroup for DevPlugins {
   fn build(self) -> PluginGroupBuilder {
     #[cfg(feature = "dev")]
     {
+      use bevy::input::common_conditions::input_toggle_active;
+      use bevy::prelude::*;
       PluginGroupBuilder::start::<Self>()
         .add(log_transitions_plugin)
         .add(exit_on_esc_plugin)
@@ -46,7 +48,10 @@ impl PluginGroup for DevPlugins {
         .add(progress_tracking_debug_plugin)
         .add(bevy::diagnostic::FrameTimeDiagnosticsPlugin)
         .add(bevy::dev_tools::fps_overlay::FpsOverlayPlugin::default())
-        .add(bevy_inspector_egui::quick::WorldInspectorPlugin::new())
+        .add(
+          bevy_inspector_egui::quick::WorldInspectorPlugin::new()
+            .run_if(input_toggle_active(false, KeyCode::F1)),
+        )
     }
     #[cfg(not(feature = "dev"))]
     {

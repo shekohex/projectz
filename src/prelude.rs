@@ -35,5 +35,8 @@ mod states {
 
 /// Environment prelude.
 mod environment {
-  pub use crate::environment::{EnvironmentAssets, EnvironmentPlugin};
+  pub use crate::environment::map_loader::{
+    AllGameMapsLoaded, GameMap, GameMapLoadedEvent, GameMaps,
+  };
+  pub use crate::environment::EnvironmentPlugin;
 }

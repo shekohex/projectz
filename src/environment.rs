@@ -3,15 +3,13 @@
 use core::f32::consts::PI;
 
 use avian3d::prelude::*;
-use bevy::color::palettes::css;
 use bevy::pbr::CascadeShadowConfigBuilder;
 use bevy::prelude::*;
-use bevy_asset_loader::prelude::*;
 
 use crate::prelude::*;
 
 /// Map Loader Plugin to organize map loading related systems
-mod map_loader;
+pub(crate) mod map_loader;
 
 /// Game Environment Plugin to organize environment related systems
 #[derive(Default, Debug, Copy, Clone)]
@@ -20,22 +18,14 @@ pub struct EnvironmentPlugin;
 impl Plugin for EnvironmentPlugin {
   fn build(&self, app: &mut App) {
     app
-      .add_plugins(map_loader::MapLoaderPlugin)
+      .add_plugins(
+        map_loader::GameMapsLoaderPlugin::builder()
+          .on_enter(GameState::LoadingEnvironmentMaps)
+          .continue_to_state(GameState::LoadingPlayerAssets)
+          .build(),
+      )
       .add_systems(OnEnter(GameState::LoadingWorld), setup_world);
   }
-}
-
-#[derive(Debug, Clone, AssetCollection, Resource)]
-pub struct EnvironmentAssets {
-  #[asset(path = "textures/np26.dds")]
-  #[asset(image(sampler(filter = nearest)))]
-  tree26: Handle<Image>,
-  #[asset(path = "textures/np27.dds")]
-  #[asset(image(sampler(filter = nearest)))]
-  tree27: Handle<Image>,
-  #[asset(path = "textures/np28.dds")]
-  #[asset(image(sampler(filter = nearest)))]
-  tree28: Handle<Image>,
 }
 
 /// A tag component for the ground
@@ -46,20 +36,21 @@ struct Ground;
 /// System to set up the world
 fn setup_world(
   mut commands: Commands,
-  environment_assets: Res<EnvironmentAssets>,
-  mut meshes: ResMut<Assets<Mesh>>,
+  game_maps_handles: Res<GameMaps>,
+  game_maps: Res<Assets<GameMap>>,
   mut materials: ResMut<Assets<StandardMaterial>>,
+  mut meshes: ResMut<Assets<Mesh>>,
   mut next_state: ResMut<NextState<GameState>>,
 ) {
+  // arena.
+  let first_map = &game_maps_handles.handles[&1005];
+  let game_map = game_maps.get(first_map).expect("map to be loaded");
   // ground for 3D
   commands.spawn((
-    Mesh3d(meshes.add(Plane3d::new(Vec3::Y, Vec2::new(100.0, 100.0)))),
-    MeshMaterial3d(materials.add(StandardMaterial {
-      base_color: Color::from(css::DARK_GREEN),
-      metallic: 0.5,
-      reflectance: 0.7,
-      ..default()
-    })),
+    Mesh3d(meshes.add(Plane3d::new(
+      Vec3::Y,
+      Vec2::new(f32::from(game_map.width), f32::from(game_map.height)),
+    ))),
     Transform::from_xyz(0.0, 0.0, 0.0),
     Ground,
     RigidBody::Static,
@@ -85,49 +76,48 @@ fn setup_world(
     .build(),
   ));
 
-  // A Simple Cube in 3D
-  commands.spawn((
-    Mesh3d(meshes.add(Cuboid::new(1.0, 1.0, 1.0))),
-    MeshMaterial3d(materials.add(StandardMaterial {
-      base_color: Color::from(css::DARK_BLUE),
-      metallic: 0.5,
-      reflectance: 0.7,
-      ..default()
-    })),
-    Transform::from_xyz(-1.5, 0.5, -1.5),
-    Name::from("Cube"),
-    RigidBody::Dynamic,
-    Collider::cuboid(1.0, 1.0, 1.0),
-  ));
+  const PPM: f32 = 1.0;
+  const TEXTURE_SIZE: f32 = 256.0 / PPM;
+  const HALF_SIZE: Vec2 = Vec2::new(TEXTURE_SIZE / 2.0, TEXTURE_SIZE / 2.0);
 
-  // Sprites
-  for (i, image) in [
-    environment_assets.tree26.clone(),
-    environment_assets.tree27.clone(),
-    environment_assets.tree28.clone(),
-  ]
-  .into_iter()
-  .cycle()
-  .take(6)
-  .enumerate()
-  {
-    let neg = if i % 2 == 0 { -1.0 } else { 1.0 };
-    commands.spawn((
-      Sprite3D {
-        image,
-        alpha_mode: AlphaMode::Blend,
-        pixels_per_metre: 30.00,
-        ..default()
-      },
-      Name::from(format!("Sprite {}", i)),
-      Transform::from_xyz(
-        i as f32 * 4.0 - 16.0 * neg,
-        4.0,
-        i as f32 * 9.0 + 10.0 * -neg,
-      ),
-      RigidBody::Static,
-      Collider::cylinder(0.1, 6.0),
-    ));
+  let map_width = f32::from(game_map.width);
+  let map_height = f32::from(game_map.height);
+  debug!(id = %game_map.id, %map_width, %map_height, "Map Layout");
+
+  let parent = commands
+    .spawn((
+      Name::from(format!("GameMap({})", game_map.id)),
+      Transform::from_xyz(0.0, 0.0, 0.0),
+      InheritedVisibility::VISIBLE,
+    ))
+    .id();
+  for puzzle in &game_map.puzzles {
+    let puzzle_width = f32::from(puzzle.width);
+    let puzzle_height = f32::from(puzzle.height);
+    let shift_x = puzzle_width * HALF_SIZE.x;
+    let shift_y = puzzle_height * HALF_SIZE.y;
+    debug!(%puzzle_width, %puzzle_height, "Puzzle Layout");
+    // we will need to shift the parts x and z to make them in the center
+    for part in &puzzle.parts {
+      let part_x = f32::from(part.x) * TEXTURE_SIZE;
+      let part_y = f32::from(part.y) * TEXTURE_SIZE;
+      commands
+        .spawn((
+          Mesh3d(meshes.add(Plane3d::new(Vec3::Y, HALF_SIZE))),
+          MeshMaterial3d(materials.add(StandardMaterial {
+            base_color_texture: Some(part.texture.clone()),
+            alpha_mode: AlphaMode::Opaque,
+            unlit: true,
+            reflectance: 0.0,
+            ..default()
+          })),
+          // a little bit higher than the ground
+          Name::from(format!("PuzzlePart({}, {})", part.x, part.y)),
+          Transform::from_xyz(part_x - shift_x, 0.5, part_y - shift_y),
+        ))
+        .set_parent(parent);
+    }
   }
+
   next_state.set(GameState::LoadingPlayer)
 }

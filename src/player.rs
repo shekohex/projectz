@@ -46,6 +46,8 @@ pub struct Player;
 pub struct PlayerAssets {
   #[asset(path = "meshes/man.glb")]
   pub skeleton: Handle<Gltf>,
+  #[asset(path = "meshes/character.glb")]
+  pub character: Handle<Gltf>,
 }
 
 /// A run condition that's always false
@@ -61,18 +63,25 @@ fn spawn_player(
   player_assets: ResMut<PlayerAssets>,
   mut state: ResMut<NextState<GameState>>,
 ) {
-  let Some(gltf) = gltf_assets.get(&player_assets.skeleton) else {
+  let Some(gltf) = gltf_assets.get(&player_assets.character) else {
     return;
   };
 
   commands.spawn((
-    SceneRoot(gltf.named_scenes.get("Library").expect("No scene named `Library`").clone()),
+    SceneRoot(gltf.named_scenes.get("Scene").expect("No scene named `Scene`").clone()),
     Name::from("Player 3D"),
     Player,
-    Transform::from_xyz(0.0, 1.5, 0.0),
+    Transform::from_xyz(0.0, 0.1, 0.0)
+      .with_rotation(Quat::from_euler(
+        EulerRot::XYZ,
+        -90.0f32.to_radians(),
+        0.0,
+        -180f32.to_radians(),
+      ))
+      .with_scale(Vec3::splat(0.75)),
     RigidBody::Dynamic,
-    Collider::capsule(0.5, 2.0),
-    TnuaAvian3dSensorShape(Collider::cylinder(0.49, 0.0)),
+    Collider::capsule(1.0, 1.0),
+    TnuaAvian3dSensorShape(Collider::cylinder(0.99, 0.0)),
     TnuaController::default(),
     TnuaAnimatingState::<animations::PlayerAnimationState>::default(),
     LockedAxes::ROTATION_LOCKED.unlock_rotation_y(),

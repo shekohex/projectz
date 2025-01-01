@@ -101,9 +101,11 @@ fn setup_player_animations(
   gltf_assets: Res<Assets<Gltf>>,
   player_assets: Res<PlayerAssets>,
 ) {
-  let Some(gltf) = gltf_assets.get(&player_assets.skeleton) else {
+  let Some(gltf) = gltf_assets.get(&player_assets.character) else {
     return;
   };
+
+  debug!(animations = ?gltf.named_animations.keys(), "Setting up player animations");
 
   for entity in player_query.iter() {
     // Find the first child with an animation player, this our player mesh
@@ -120,7 +122,7 @@ fn setup_player_animations(
 
     let mut animations = PlayerAnimations::default();
 
-    for animation in PlayerAnimationState::VARIANTS {
+    for animation in [PlayerAnimationState::Jumping] {
       use PlayerAnimationState::*;
       let animation_clip = gltf
         .named_animations
@@ -278,7 +280,7 @@ fn update_player_animations(
           PlayerAnimationState::Jumping => {
             animation_transitions
               .play(&mut animation_player, animations.jumping, Duration::ZERO)
-              .set_speed(1.0);
+              .set_speed(4.0);
           },
           PlayerAnimationState::Walking => {
             animation_transitions
