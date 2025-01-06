@@ -15,7 +15,7 @@ bevy-tnua = { version = "0.21.0", default-features = false }
 # Avian3D Integration layer with Bevy Tnua for 3D physics
 bevy-tnua-avian3d = { version = "0.2", default-features = false }
 
-bevy-inspector-egui = { version = "0.28.0", optional = true }
+bevy-inspector-egui = { version = "0.28.1", optional = true }
 
 # Winit and Image are used here mainly to set up the window icon.
 # See: https://bevy-cheatbook.github.io/window/icon.html#setting-the-window-icon
