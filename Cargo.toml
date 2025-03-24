@@ -13,7 +13,7 @@ iyes_progress = { version = "0.13", features = ["assets"] }
 # Motion Controller
 bevy-tnua = { version = "0.21.0", default-features = false }
 # Avian3D Integration layer with Bevy Tnua for 3D physics
-bevy-tnua-avian3d = { version = "0.2", default-features = false }
+bevy-tnua-avian3d = { version = "0.3", default-features = false }
 
 bevy-inspector-egui = { version = "0.28.0", optional = true }
 
