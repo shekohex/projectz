@@ -8,7 +8,7 @@ publish = false
 [dependencies]
 # A Utility for loading assets in Bevy, with support for 3D assets.
 bevy_asset_loader = { version = "0.22", features = ["3d", "progress_tracking"] }
-bevy_common_assets = { version = "0.12.0", features = ["ron"] }
+bevy_common_assets = { version = "0.13.0", features = ["ron"] }
 iyes_progress = { version = "0.13", features = ["assets"] }
 # Motion Controller
 bevy-tnua = { version = "0.21.0", default-features = false }
